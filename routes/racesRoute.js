@@ -18,9 +18,6 @@ var races = require('../models/race');
  *           type: array
  */
 router.get('/', racesController.get);
-router.get('/:_id', racesController.get)
-router.post('/', racesController.post);
-router.delete('/:_id', racesController.delete);
-router.put('/:_id', racesController.edit);
+router.get('/test', racesController.getlocations);
 
 module.exports = router;
