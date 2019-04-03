@@ -6,9 +6,7 @@ var logger = require('morgan');
 var mongoose = require('mongoose');
 
 const swaggerJSDoc = require('swagger-jsdoc');
-
 var swaggerRouter = require('./routes/api-docs');
-
 var racesRouter = require('./routes/racesRoute');
 
 
@@ -33,7 +31,7 @@ Race.find({}).then(race => {
             .catch(err => console.log('\tFilling testdata failed', err));
     }
 });
-
+mongoose.set('useFindAndModify', false);
 
 var app = express();
 
@@ -54,8 +52,6 @@ app.use('/', swaggerRouter);
 app.use(function(req, res, next) {
   next(createError(404));
 });
-
-
 
 // error handler
 app.use(function(err, req, res, next) {

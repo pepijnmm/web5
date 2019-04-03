@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var assert = require('assert');
 
 let raceSchema = mongoose.Schema({
     _id: {
@@ -11,4 +12,12 @@ let raceSchema = mongoose.Schema({
     waypoints: [{type: String, ref: 'Waypoint'}]
 });
 
-let Race = module.exports = mongoose.model('Race', raceSchema);
+raceSchema.query.byPage = function (pageIndex, pageSize) {
+    pageIndex = pageIndex || 0;
+    pageSize = parseInt(pageSize) || 10;
+    return this.find().skip(pageIndex * pageSize).limit(pageSize);
+};
+
+let Race = mongoose.model('Race', raceSchema);
+
+module.exports = Race;
