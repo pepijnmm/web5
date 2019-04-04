@@ -1,30 +1,28 @@
-<div class="container text-center">
-    <h3>Races: </h3>
-    {{#each data}}
-        <div class="raceblock">
-            <h2>Race naam: {{this._id}}</h2>
-            <p>Begonnen:
-            {{#if this.isStarted}}
-                <span>ja</span>
-            {{else}}
-            <span>nee</span>
-            {{/if}}
-            </p>
-            {{#each this.waypoints}}
-                <p>punten:</p>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>naam</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>this</td>
-                    </tr>
-                    </tbody>
-                </table>
-            {{/each}}
+<div class="container">
+    <section class="content-header">
+        <h1>
+            Races
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="box box-body">
+                {{#each data}}
+                        <div class="raceblock">
+                            <h2>Race naam: {{this._id}}</h2>
+                            <p>Begonnen:
+                            {{#if this.isStarted}}
+                                <span>ja</span>
+                            {{else}}
+                            <span>nee</span>
+                            {{/if}}
+                            </p>
+                            <form action="/races/{{this._id}}">
+                                <input type="submit" value="Ga naar Race" />
+                            </form>
+                        </div>
+                {{/each}}
+            </div>
         </div>
-    {{/each}}
+    </section>
 </div>

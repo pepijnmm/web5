@@ -4,6 +4,10 @@ var express = require('express');
 var unirest = require('unirest');
 
 exports.get = function(req, res, next) {
+  if(req.headers["Accept"] == undefined || req.headers["Accept"] != 'application/json') {
+  next();
+  return;
+  }
     var query = {};
 
     if (req.params._id) {
@@ -17,13 +21,7 @@ exports.get = function(req, res, next) {
       if (req.params._id) {
         data = data[0];
       }
-
-      if(req.headers["Accept"] != undefined && req.headers["Accept"] == 'application/json') {
         return res.json(data);
-      }
-    else{
-        return res.render('race/index', { data: data })
-      }
     }).catch(err => {
       console.log(err);
       res.status(err.status || 500);
@@ -31,7 +29,6 @@ exports.get = function(req, res, next) {
     });
 
   }
-
 exports.post = function(req, res, next) {
   var race = new Race(req.body);
   race.save(function(err)
@@ -68,7 +65,6 @@ exports.post = function(req, res, next) {
         }
       })
   }
-
   exports.edit = function(req, res, next)
   {
     Race.findByIdAndUpdate(req.params._id, req.body, {new: true}, (err, race) =>

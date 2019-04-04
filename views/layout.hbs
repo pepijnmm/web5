@@ -1,79 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="NL-nl">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <meta name="robots" content="noindex">
-
-
-    <title>Streetcats</title>
-
-    <!-- Styles -->
-    <link href="css/admin.css" rel="stylesheet">
+    <title>titel</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/css/AdminLTE.css">
+    <!-- Color style -->
+    <link rel="stylesheet" href="/css/skin-green.css">
+    <!-- jQuery 3 -->
+    <script src="/js/jquery.min.js" defer></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="/js/bootstrap.min.js" defer></script>
+    <!-- AdminLTE App -->
+    <script src="/js/adminlte.min.js" defer></script>
+    <!-- Extra code -->
+    <script src="/js/sendtoserver.js" defer></script>
 </head>
-<body class="no-footer">
-<div id="app" class="app">
-    <div class="app-body">
-        <div class="app-sidebar sidebar-dark">
-            <!-- Header -->
-            <div class="sidebar-header">
-                <p class="username"> gebruiker</p>
-            </div>
 
-            <!-- Navigation -->
-            <div id="sidebar-nav" class="sidebar-nav" data-children=".sidebar-nav-group">
-                <a href="" class="sidebar-nav-link">
-                    Ga naar de homepagina
-                </a>
-                <div class="sidebar-nav-group">
-                    <a href="#page-group" class="sidebar-nav-link collapsed" data-toggle="collapse"
-                       data-parent="#sidebar-nav">
-                        <i class="icon-docs icons"></i>
-                        Pagina's
+<body class="hold-transition skin-green sidebar-mini">
+<div class="wrapper">
+
+    <header class="main-header">
+        <!-- Logo -->
+        <a href="/admin" class="logo">
+            <!-- mini logo for sidebar mini 50x50 pixels -->
+            <span class="logo-mini"><b>B</b>P</span>
+            <!-- logo for regular state and mobile devices -->
+            <span class="logo-lg"><b>Beheer</b>Panel</span>
+        </a>
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top">
+            <!-- Sidebar toggle button-->
+            <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                <span class="sr-only">Toggle navigation</span>
+            </a>
+
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+                    <!-- Messages: style can be found in dropdown.less-->
+                    <!-- User Account: style can be found in dropdown.less -->
+                    <li class="dropdown user user-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span>gebruiker</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="user-footer">
+                                <a href="" class="btn btn-default btn-flat">Uitloggen</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <!-- Left side column. contains the logo and sidebar -->
+    <aside class="main-sidebar">
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+            <!-- sidebar menu: : style can be found in sidebar.less -->
+            <ul class="sidebar-menu" data-widget="tree">
+                <li class="treeview">
+                    <a href="#"><span>Race</span>
+                        <span class="pull-right-container">
+                                  <i class="fa fa-angle-left pull-right"></i>
+                                </span>
                     </a>
-                    <div id="page-group" class="sidebar-nav-group collapse">
-                        <a href="" class="sidebar-nav-link">
-                            <i class="icon-list icons"></i>
-                            Beheer pagina's
-                        </a>
-                        <a href="" class="sidebar-nav-link">
-                            <i class="icon-note icons"></i>
-                            Creëer pagina
-                        </a>
-                    </div>
-                </div>
-            </div>
+                    <ul class="treeview-menu">
+                        <li><a href="/races"><i class="fa fa-table"></i> Index</a></li>
+                        <li><a href="/races/create"><i class="fa fa-plus-circle"></i> Toevoegen</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <!-- /.sidebar -->
+    </aside>
 
-            <!-- Footer -->
-            <div class="sidebar-footer">
-                <a href="/logout" data-toggle="tooltip" title="Logout">
-                    <i class="fa fa-power-off"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="app-content">
-            <nav class="navbar navbar-expand navbar-light bg-white">
-                <button type="button" class="btn btn-sidebar" data-toggle="sidebar">
-                    <i class="fa fa-bars"></i>
-                </button>
-                <a href="/">
-                    <div class="navbar-brand">Beer race</div>
-                </a>
-            </nav>
-
-            <div class="container">
-
-            </div>
-
-            {{{body}}}
-        </div>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        {{{body}}}
     </div>
-</div>
+    <!-- /.content-wrapper -->
+    <footer class="main-footer">
 
-<!-- Scripts -->
-<script src="/js/app.js"></script>
+    </footer>
+    <!-- /.control-sidebar -->
+    <!-- Add the sidebar's background. This div must be placed
+   immediately after the control sidebar -->
+    <div class="control-sidebar-bg"></div>
+</div>
+<!-- ./wrapper -->
 </body>
+
 </html>
