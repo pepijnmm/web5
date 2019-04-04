@@ -4,27 +4,32 @@ var express = require('express');
 var unirest = require('unirest');
 
 exports.get = function(req, res, next) {
-  var query = {};
+    var query = {};
 
-	if(req.params._id){
-		query._id = req.params._id;
-  } 
-  
-  var result = Race.find(query)
-  .byPage(req.query.pageIndex, req.query.pageSize);
-
-  result.then(data => {
-    if(req.params._id)
-    {
-      data = data[0];
+    if (req.params._id) {
+      query._id = req.params._id;
     }
 
-    return res.json(data);
+    var result = Race.find(query)
+        .byPage(req.query.pageIndex, req.query.pageSize);
+
+    result.then(data => {
+      if (req.params._id) {
+        data = data[0];
+      }
+
+      if(req.headers["Accept"] != undefined && req.headers["Accept"] == 'application/json') {
+        return res.json(data);
+      }
+    else{
+        return res.render('race/index', { data: data })
+      }
     }).catch(err => {
       console.log(err);
       res.status(err.status || 500);
       res.render('error');
     });
+
   }
 
 exports.post = function(req, res, next) {

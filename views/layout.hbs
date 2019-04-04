@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="robots" content="noindex">
+
+
+    <title>Streetcats</title>
+
+    <!-- Styles -->
+    <link href="css/admin.css" rel="stylesheet">
+</head>
+<body class="no-footer">
+<div id="app" class="app">
+    <div class="app-body">
+        <div class="app-sidebar sidebar-dark">
+            <!-- Header -->
+            <div class="sidebar-header">
+                <p class="username"> gebruiker</p>
+            </div>
+
+            <!-- Navigation -->
+            <div id="sidebar-nav" class="sidebar-nav" data-children=".sidebar-nav-group">
+                <a href="" class="sidebar-nav-link">
+                    Ga naar de homepagina
+                </a>
+                <div class="sidebar-nav-group">
+                    <a href="#page-group" class="sidebar-nav-link collapsed" data-toggle="collapse"
+                       data-parent="#sidebar-nav">
+                        <i class="icon-docs icons"></i>
+                        Pagina's
+                    </a>
+                    <div id="page-group" class="sidebar-nav-group collapse">
+                        <a href="" class="sidebar-nav-link">
+                            <i class="icon-list icons"></i>
+                            Beheer pagina's
+                        </a>
+                        <a href="" class="sidebar-nav-link">
+                            <i class="icon-note icons"></i>
+                            Creëer pagina
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <a href="/logout" data-toggle="tooltip" title="Logout">
+                    <i class="fa fa-power-off"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="app-content">
+            <nav class="navbar navbar-expand navbar-light bg-white">
+                <button type="button" class="btn btn-sidebar" data-toggle="sidebar">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a href="/">
+                    <div class="navbar-brand">Beer race</div>
+                </a>
+            </nav>
+
+            <div class="container">
+
+            </div>
+
+            {{{body}}}
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="/js/app.js"></script>
+</body>
+</html>
