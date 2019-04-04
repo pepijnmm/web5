@@ -1,0 +1,28 @@
+<div class="container">
+    <section class="content-header">
+        <h1>
+            Races
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="box box-body">
+                {{#each data}}
+                        <div class="raceblock">
+                            <h2>Race naam: {{this._id}}</h2>
+                            <p>Begonnen:
+                            {{#if this.isStarted}}
+                                <span>ja</span>
+                            {{else}}
+                            <span>nee</span>
+                            {{/if}}
+                            </p>
+                            <form action="/races/{{this._id}}">
+                                <input type="submit" value="Ga naar Race" />
+                            </form>
+                        </div>
+                {{/each}}
+            </div>
+        </div>
+    </section>
+</div>

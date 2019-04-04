@@ -1,0 +1,39 @@
+<div class="container">
+    <section class="content-header">
+        <h1>
+            Races
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="box box-body">
+                        <div class="raceblock">
+                            <h2>Race naam: {{data._id}}</h2>
+                            <p>Begonnen:
+                            {{#if data.isStarted}}
+                                <span>ja</span>
+                            {{else}}
+                            <span>nee</span>
+                            {{/if}}
+                            </p>
+                            <p>punten:</p>
+                            <a href="/races/{{data._id}}/waypoints">Nieuwe toevoegen</a>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>naam</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {{#each data.waypoints}}
+                                        <tr>
+                                            <td>this</td>
+                                        </tr>
+                                {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+            </div>
+        </div>
+    </section>
+</div>
