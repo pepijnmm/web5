@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Race = require('../models/race');
 var express = require('express');
+var unirest = require('unirest');
 
 exports.get = function(req, res, next) {
   var query = {};
@@ -79,38 +80,43 @@ exports.post = function(req, res, next) {
       }
     });
   }
-exports.getlocations = function(req, res, next) {
-  const urllatlong="https://nominatim.openstreetmap.org/search/search.php?q=",
-      urllatlongend="&format=json"
-  stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];(node(",
-      endcafes = ")[amenity=bar];);out%20center;%3E;out;";
-  const meters = 10,
-      adress = "lange+Tuinstraat+3+5212SG+Den+Bosch+The+Netherlands";
-  unirest.get(urllatlong+adress+urllatlongend).end(function (result) {
-    console.log(result);
-    const lat = result[0]["lat"],
-        long = result[0]["long"];
-    var latRadian = 3958.7558657440545;
+//adres = straat nummer postcode plaats land(in engels)   meters 500 kan goed
+exports.getlocations = function(adress, meters) {
+  const urllatlong = "https://nominatim.openstreetmap.org/search/search.php?q=",
+      urllatlongend = "&format=json",
+      stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];(",
+      endcafes = ");out;";
 
-    var degLatKm = 110.574235;
-    var degLongKm = 110.572833 * Math.cos(latRadian);
-    var deltaLat = meters / 1000.0 / degLatKm;
-    var deltaLong = meters / 1000.0 / degLongKm;
-
-
-    var topLat = lat + deltaLat;
-    var bottomLat = lat - deltaLat;
-    var leftLng = long - deltaLong;
-    var rightLng = long + deltaLong;
-
-    var northEastCoords = topLat + ',' + rightLng;
-    var southWestCoords = bottomLat + ',' + leftLng;
-    unirest.get(stcafes+northEastCoords+","+southWestCoords+endcafes)
-        .header("Accept", "application/json")
-        .end(function (result) {
-          res.send(result);
-        });
+  if(req.body.adress && req.body.adress != ""){
+  unirest.get(urllatlong + req.body.adress + urllatlongend).header("User-Agent", "racedrinkgame").header("Accept", "application/json").end(function (result) {
+    if (result.body[0] != "" || result.body != undefined) {
+      const lat = parseFloat(result.body[0]["lat"]),
+          long = parseFloat(result.body[0]["lon"]);
+      unirest.get(stcafes + returncoords(lat, long, meters) + endcafes)
+          .end(function (result) {
+            if (req.body["elements"] != null && req.body["elements"].length > 0){
+              return result.body;
+            }
+            else{
+              return false;
+            }
+          });
+    } else {
+      return null;
+    }
   });
 }
+};
     
  
+function returncoords(lat,long, distance){
+  return "node[amenity=pub](around:"+distance+","+lat+","+long+");" +
+      "way[amenity=pub](around:"+distance+","+lat+","+long+");" +
+      "relation[amenity=pub](around:"+distance+","+lat+","+long+");" +
+      "node[amenity=cafe](around:"+distance+","+lat+","+long+");" +
+      "way[amenity=cafe](around:"+distance+","+lat+","+long+");" +
+      "relation[amenity=cafe](around:"+distance+","+lat+","+long+");" +
+      "node[amenity=bar](around:"+distance+","+lat+","+long+");" +
+      "way[amenity=bar](around:"+distance+","+lat+","+long+");" +
+      "relation[amenity=bar](around:"+distance+","+lat+","+long+");";
+}
