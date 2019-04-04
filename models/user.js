@@ -17,11 +17,15 @@ var userSchema = mongoose.Schema({
         token: String,
         email: String,
         name: String
+    },
+    isAdmin: {
+        default: false,
+        type: Boolean
     }
 });
 
 userSchema.methods.validPassword = function(password) {
-    return password === this.local.password; //bcrypt.compareSync(password, this.local.password);
+    return password === this.local.password;
 };
 
 let User = mongoose.model('User', userSchema);

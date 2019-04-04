@@ -1,3 +1,4 @@
+
 var LocalStrategy    = require('passport-local').Strategy;
 var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy;
 var User = require('../models/user');
@@ -14,6 +15,7 @@ module.exports = function(passport) {
         });
     });
 
+    
     passport.use('local-login', new LocalStrategy({
         usernameField: 'email',
         passwordField: 'password',
@@ -56,18 +58,34 @@ module.exports = function(passport) {
     },
     function(req, email, password, done) {
         if (email)
-            email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
-
-        // asynchronous
+        {
+            email = email.toLowerCase();
+        }
+          
         process.nextTick(function() {
-            // if the user is not already logged in:
-            if (!req.user) {
+            const bearerHeader = req.headers['authorization'];
+            var userToken = null;
+    
+            if(typeof bearerHeader !== 'undefined'){
+                const bearer = bearerHeader.split(' ');
+                const bearerToken = bearer[1];
+    
+                jwt.verify(bearerToken, 'geheim', (err, data) => {
+                    if(err)
+                    {
+                    }
+                    else{
+                     userToken = data;
+                    }
+                });
+            }
+
+            if (!userToken) {
                 User.findOne({ 'local.email' :  email }, function(err, user) {
-                    // if there are any errors, return the error
                     if (err){
                         return done(err);
                     }
-                        
+                    
                     if (user) {
                         return done(null, false, "email taken");
                     } else {
@@ -84,31 +102,44 @@ module.exports = function(passport) {
                     }
                 });
 
-            // if the user is logged in but has no local account...
-            } else if ( !req.user.local.email ) {
-                // ...presumably they're trying to connect a local account
-                // BUT let's check if the email used to connect a local account is being used by another user
+            } else if (!userToken.user.local ) {
                 User.findOne({ 'local.email' :  email }, function(err, user) {
+                    console.log(user);
                     if (err)
                         return done(err);
                     
                     if (user) {
-                        return done(null, false, req.flash('loginMessage', 'That email is already taken.'));
-                        // Using 'loginMessage instead of signupMessage because it's used by /connect/local'
+                        return done(null, false, "Email is already in use");
+
                     } else {
-                        var user = req.user;
-                        user.local.email = email;
-                        user.local.password = user.generateHash(password);
-                        user.save(function (err) {
-                            if (err)
-                                return done(err);
-                            
-                            return done(null,user);
-                        });
+                        User.findById(userToken.user._id, function(err, user)
+                    
+                    {
+                    
+                        if(err)
+                        return done(err);
+
+                        if(user)
+                        {
+                            user.local.email = email;
+                            user.local.password = password;
+                            user.save(function (err) {
+                                if (err)
+                                    return done(err);
+                                
+                                    jwt.sign({user: user}, 'geheim', (err, token) =>{
+                                        if(err)
+                                            return done(null, false, "Not logged in");
+                                        
+                                        return done(null, user, token);
+                                    }); 
+                            });
+                        }
+                    })                        
                     }
                 });
             } else {
-                return done(null, req.user);
+                return done(null, true);
             }
 
         });
@@ -125,16 +156,30 @@ module.exports = function(passport) {
     },
     function(req, token, refreshToken, profile, done) {
         process.nextTick(function() {
+            const bearerHeader = req.headers['authorization'];
+            var userToken = null;
+    
+            if(typeof bearerHeader !== 'undefined'){
+                const bearer = bearerHeader.split(' ');
+                const bearerToken = bearer[1];
+    
+                jwt.verify(bearerToken, 'geheim', (err, data) => {
+                    if(err)
+                    {
+                    }
+                    else{
+                     userToken = data;
+                    }
+                });
+            }
 
-            // check if the user is already logged in
-            if (!req.user) {
+            if (!userToken) {
 
                 User.findOne({ 'google.id' : profile.id }, function(err, user) {
                     if (err)
                         return done(err);
 
                     if (user) {
-                        // if there is a user id already but no token (user was linked at one point and then removed)
                         if (!user.google.token) {
                             user.google.token = token;
                             user.google.name = profile.displayName;
@@ -143,10 +188,17 @@ module.exports = function(passport) {
                                 if (err)
                                     return done(err);
                                     
-                                return done(null, user);
+                                   
                             });
                         }
-                        return done(null, user);
+
+                        jwt.sign({user: user}, 'geheim', (err, token) =>{
+                            if(err)
+                                return done(null, false, "Not logged in");
+                            
+                            return done(null, user, token);
+                        }); 
+                        
                     } else {
                         var newUser = new User();
 
@@ -159,27 +211,44 @@ module.exports = function(passport) {
                             if (err)
                                 return done(err);
                                 
-                            return done(null, newUser);
+                                jwt.sign({user: newUser}, 'geheim', (err, token) =>{
+                                    if(err)
+                                        return done(null, false, "Not logged in");
+                                    
+                                    return done(null, newUser, token);
+                                }); 
                         });
                     }
                 });
 
             } else {
-                // user already exists and is logged in, we have to link accounts
-                var user               = req.user; // pull the user out of the session
-
-                user.google.id    = profile.id;
-                user.google.token = token;
-                user.google.name  = profile.displayName;
-                user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-                user.save(function(err) {
-                    if (err)
+        
+                User.findById(userToken.user.id, function(err, user)
+                    {
+                        if(err)
                         return done(err);
-                        
-                    return done(null, user);
-                });
 
+                        if(user)
+                        {
+                            user.google.id = profile.id;
+                            user.google.token = token;
+                            user.google.name = profile.displayName;
+                            user.google.email = (profile.emails[0].value || '').toLowerCase();
+            
+                            user.save(function(err) {
+                                if (err){
+                                    return done(err);
+                                }
+                                    
+                                jwt.sign({user: user}, 'geheim', (err, token) =>{
+                                    if(err)
+                                        return done(null, false, "Not logged in");
+                                    
+                                    return done(null, user, token);
+                                }); 
+                            });
+                        }
+                    })         
             }
 
         });
