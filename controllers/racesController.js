@@ -1,6 +1,28 @@
 var mongoose = require('mongoose');
 var Race = require('../models/race');
 var express = require('express');
+
+var jwt = require('jsonwebtoken');
+
+exports.get = function(req, res, next) {
+  jwt.verify(req.token, 'geheim', (err, data) => {
+    if(err)
+    {
+      res.sendStatus(403);
+    }else{
+      
+    }
+  })
+
+  var query = {};
+
+	if(req.params._id){
+		query._id = req.params._id;
+  } 
+  
+  var result = Race.find(query)
+  .byPage(req.query.pageIndex, req.query.pageSize);
+}
 var unirest = require('unirest');
 
 exports.get = function(req, res, next) {
@@ -9,6 +31,7 @@ exports.get = function(req, res, next) {
   return;
   }
     var query = {};
+
 
     if (req.params._id) {
       query._id = req.params._id;

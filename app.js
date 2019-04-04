@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
+var jwt = require('jsonwebtoken');
+var session = require('express-session');
+var passport = require('passport');
 
 const swaggerJSDoc = require('swagger-jsdoc');
 var swaggerRouter = require('./routes/api-docs');
@@ -21,6 +24,7 @@ db.once('open', function() {
 //models
 require('./models/race');
 require('./models/waypoint');
+require('./models/user');
 
 let Race = mongoose.model('Race');
 Race.find({}).then(race => {
@@ -32,6 +36,8 @@ Race.find({}).then(race => {
     }
 });
 mongoose.set('useFindAndModify', false);
+
+require('./config/passport')(passport);
 
 var app = express();
 
@@ -45,8 +51,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(session({
+  secret: 'ilovescotchscotchyscotchscotch', // session secret
+  resave: true,
+  saveUninitialized: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/races', racesRouter);
 app.use('/', swaggerRouter);
+require('./routes/userRoute.js')(app, passport);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
