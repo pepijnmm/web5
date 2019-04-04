@@ -8,17 +8,11 @@ module.exports = {
         'profileFields'   : ['id', 'email', 'name'] // For requesting permissions from Facebook API
 
     },
-
-    'twitterAuth' : {
-        'consumerKey'        : 'your-consumer-key-here',
-        'consumerSecret'     : 'your-client-secret-here',
-        'callbackURL'        : 'http://localhost:8080/auth/twitter/callback'
-    },
-
+    
     'googleAuth' : {
         'clientID'      : '856733135469-khnkpk9jmdubgtbonogcaqfum7sjvmfj.apps.googleusercontent.com',
         'clientSecret'  : 'X-HL8WM52VobHWGvld10N7lX',
-        'callbackURL'   : 'http://localhost:8080/auth/google/callback'
+        'callbackURL'   : 'http://localhost:3000/auth/google/callback'
     }
 
 };

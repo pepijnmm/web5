@@ -17,10 +17,26 @@ var races = require('../models/race');
  *         schema:
  *           type: array
  */
-router.get('/', racesController.get);
+router.get('/', verifyToken, racesController.get);
 router.get('/:_id', racesController.get)
 router.post('/', racesController.post);
 router.delete('/:_id', racesController.delete);
 router.put('/:_id', racesController.edit);
+
+
+function verifyToken(req, res, next)
+{
+    //get auth header val
+    const bearerHeader = req.headers['authorization'];
+
+    if(typeof bearerHeader !== 'undefined'){
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1];
+        req.token = bearerToken;
+        next();
+    }else{
+        res.sendStatus(403);
+    }
+}
 
 module.exports = router;

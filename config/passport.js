@@ -1,8 +1,8 @@
-var localStrat    = require('passport-local').Strategy;
-var facebookStrat = require('passport-facebook').Strategy;
-var googleStrat   = require('passport-google-oauth').OAuth2Strategy;
+var LocalStrategy    = require('passport-local').Strategy;
+var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy;
 var User = require('../models/user');
 var conf = require('./auth');
+var jwt = require('jsonwebtoken');
 
 module.exports = function(passport) {
     passport.serializeUser(function(user, done) {
@@ -15,9 +15,9 @@ module.exports = function(passport) {
     });
 
     passport.use('local-login', new LocalStrategy({
-        usernameField : 'email',
-        passwordField : 'password',
-        passReqToCallback : true
+        usernameField: 'email',
+        passwordField: 'password',
+        passReqToCallback: true
     },
     function(req, email, password, done) {
         if (email)
@@ -27,22 +27,32 @@ module.exports = function(passport) {
             User.findOne({ 'local.email' :  email }, function(err, user) {
                 if (err)
                     return done(err);
-                // if (!user)
-                //     return done(null, false, req.flash('loginMessage', 'No user found.'));
-                // if (!user.validPassword(password))
-                //     return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
-                else
-                    return done(null, user);
+                if(!user)
+                {
+                   return done(null, false, "No user found");
+                }
+                if(!user.validPassword(password))
+                {
+                    return done(null, false, "Wrong password");
+                }
+                else{
+                    jwt.sign({user: user}, 'geheim', (err, token) =>{
+                        if(err)
+                            return done(null, false, "Not logged in");
+                        
+                        return done(null, user, token);
+                    }); 
+                } 
             });
         });
 
     }));
 
     passport.use('local-signup', new LocalStrategy({
-        // by default, local strategy uses username and password, we will override with email
-        usernameField : 'email',
-        passwordField : 'password',
-        passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+    
+        usernameField: 'email',
+        passwordField: 'password',
+        passReqToCallback: true 
     },
     function(req, email, password, done) {
         if (email)
@@ -54,29 +64,26 @@ module.exports = function(passport) {
             if (!req.user) {
                 User.findOne({ 'local.email' :  email }, function(err, user) {
                     // if there are any errors, return the error
-                    if (err)
+                    if (err){
                         return done(err);
-
-                    // check to see if theres already a user with that email
+                    }
+                        
                     if (user) {
-                        return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
+                        return done(null, false, "email taken");
                     } else {
+                        var nUser = new User();
+                        nUser.local.email = email;
+                        nUser.local.password = password; 
 
-                        // create the user
-                        var newUser            = new User();
-
-                        newUser.local.email    = email;
-                        newUser.local.password = newUser.generateHash(password);
-
-                        newUser.save(function(err) {
+                        nUser.save(function(err) {
                             if (err)
                                 return done(err);
 
-                            return done(null, newUser);
+                            return done(null, nUser, "Succesful");
                         });
                     }
-
                 });
+
             // if the user is logged in but has no local account...
             } else if ( !req.user.local.email ) {
                 // ...presumably they're trying to connect a local account
@@ -101,7 +108,6 @@ module.exports = function(passport) {
                     }
                 });
             } else {
-                // user is logged in and already has a local account. Ignore signup. (You should log out before trying to create a new account, user!)
                 return done(null, req.user);
             }
 
@@ -109,91 +115,15 @@ module.exports = function(passport) {
 
     }));
 
-    // =========================================================================
-    // FACEBOOK ================================================================
-    // =========================================================================
-    var fbStrategy = configAuth.facebookAuth;
-    fbStrategy.passReqToCallback = true;  // allows us to pass in the req from our route (lets us check if a user is logged in or not)
-    passport.use(new FacebookStrategy(fbStrategy,
-    function(req, token, refreshToken, profile, done) {
-
-        // asynchronous
-        process.nextTick(function() {
-
-            // check if the user is already logged in
-            if (!req.user) {
-
-                User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
-                    if (err)
-                        return done(err);
-
-                    if (user) {
-
-                        // if there is a user id already but no token (user was linked at one point and then removed)
-                        if (!user.facebook.token) {
-                            user.facebook.token = token;
-                            user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
-                            user.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
-                            user.save(function(err) {
-                                if (err)
-                                    return done(err);
-                                    
-                                return done(null, user);
-                            });
-                        }
-
-                        return done(null, user); // user found, return that user
-                    } else {
-                        // if there is no user, create them
-                        var newUser            = new User();
-
-                        newUser.facebook.id    = profile.id;
-                        newUser.facebook.token = token;
-                        newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
-                        newUser.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
-                        newUser.save(function(err) {
-                            if (err)
-                                return done(err);
-                                
-                            return done(null, newUser);
-                        });
-                    }
-                });
-
-            } else {
-                // user already exists and is logged in, we have to link accounts
-                var user            = req.user; // pull the user out of the session
-
-                user.facebook.id    = profile.id;
-                user.facebook.token = token;
-                user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
-                user.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
-                user.save(function(err) {
-                    if (err)
-                        return done(err);
-                        
-                    return done(null, user);
-                });
-
-            }
-        });
-
-    }));
-
     passport.use(new GoogleStrategy({
 
-        clientID        : configAuth.googleAuth.clientID,
-        clientSecret    : configAuth.googleAuth.clientSecret,
-        callbackURL     : configAuth.googleAuth.callbackURL,
-        passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+        clientID: conf.googleAuth.clientID,
+        clientSecret: conf.googleAuth.clientSecret,
+        callbackURL: conf.googleAuth.callbackURL,
+        passReqToCallback: true
 
     },
     function(req, token, refreshToken, profile, done) {
-
-        // asynchronous
         process.nextTick(function() {
 
             // check if the user is already logged in
@@ -204,13 +134,11 @@ module.exports = function(passport) {
                         return done(err);
 
                     if (user) {
-
                         // if there is a user id already but no token (user was linked at one point and then removed)
                         if (!user.google.token) {
                             user.google.token = token;
-                            user.google.name  = profile.displayName;
-                            user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
+                            user.google.name = profile.displayName;
+                            user.google.email = (profile.emails[0].value || '').toLowerCase();
                             user.save(function(err) {
                                 if (err)
                                     return done(err);
@@ -218,15 +146,14 @@ module.exports = function(passport) {
                                 return done(null, user);
                             });
                         }
-
                         return done(null, user);
                     } else {
-                        var newUser          = new User();
+                        var newUser = new User();
 
-                        newUser.google.id    = profile.id;
+                        newUser.google.id = profile.id;
                         newUser.google.token = token;
-                        newUser.google.name  = profile.displayName;
-                        newUser.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
+                        newUser.google.name = profile.displayName;
+                        newUser.google.email = (profile.emails[0].value || '').toLowerCase();
 
                         newUser.save(function(err) {
                             if (err)
@@ -258,7 +185,4 @@ module.exports = function(passport) {
         });
 
     }));
-
-};
-
-
+}

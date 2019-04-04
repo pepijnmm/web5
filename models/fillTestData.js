@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 Race = mongoose.model('Race');
 Waypoint = mongoose.model('Waypoint');
+User = mongoose.model('User');
 
 let waypoint_seed = [
     {
@@ -20,10 +21,20 @@ let race_seed = [
     }
 ];
 
+let user_seed = [
+    {
+        local: {
+        email: "test123",
+        password: "test123"
+        }
+    }
+];
+
 module.exports = new Promise((resolve, reject) => {
     Promise.all([
         Race.insertMany(race_seed),
         Waypoint.insertMany(waypoint_seed),
+        User.insertMany(user_seed),
     ])
     .then(() => resolve())
     .catch(err => {
