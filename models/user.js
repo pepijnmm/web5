@@ -21,7 +21,9 @@ var userSchema = mongoose.Schema({
     isAdmin: {
         default: false,
         type: Boolean
-    }
+    },
+    races: [{type: String, ref: 'Race'}],
+    waypoints: [{type: String, ref: 'Waypoint'}],
 });
 
 userSchema.methods.validPassword = function(password) {

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Waypoint = require('../models/waypoint');
+var Race = require('../models/race');
 var express = require('express');
 
 exports.get = function(req, res, next) {
@@ -25,7 +26,39 @@ exports.get = function(req, res, next) {
         res.render('error');
       });
   }
+exports.getRace = function(req, res, next) {
+  var query = {};
 
+  if(req.params._oldid){
+    query._id = req.params._oldid;
+  }
+  var result = Race.find(query);
+  result.then(data => {
+    if (data[0].waypoints.length > 0) {
+      arr = [];
+      data[0].waypoints.forEach(element => {
+        arr.push(element)
+      });
+      var result = Waypoint.where('_id').in( arr)
+         .byPage(req.query.pageIndex, req.query.pageSize);
+
+      result.then(data => {
+        if (req.params._id) {
+          data = data[0];
+        }
+
+        return res.render('waypoint/index',{data: data});
+      }).catch(err => {
+        console.log(err);
+        res.status(err.status || 500);
+        res.render('error');
+      });
+    }
+    else{
+      res.render('error');
+    }
+  });
+}
 exports.post = function(req, res, next) {
   var waypoint = new Waypoint(req.body);
   waypoint.save(function(err)

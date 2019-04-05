@@ -7,21 +7,36 @@
     <section class="content">
         <div class="row">
             <div class="box box-body">
-                {{#each data}}
-                        <div class="raceblock">
-                            <h2>Race naam: {{this._id}}</h2>
-                            <p>Begonnen:
-                            {{#if this.isStarted}}
-                                <span>ja</span>
-                            {{else}}
-                            <span>nee</span>
-                            {{/if}}
-                            </p>
-                            <form action="/races/{{this._id}}">
-                                <input type="submit" value="Ga naar Race" />
-                            </form>
-                        </div>
-                {{/each}}
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>naam</th>
+                        <th>Aan</th>
+                        <th>opties</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each data}}
+                        <tr>
+                            <td>{{this._id}}</td>
+                            <td>
+                                {{#if this.isStarted}}
+                                        ja
+                                {{else}}
+                                        nee
+                                {{/if}}
+                            </td>
+                            <td>
+                                <form action="/races/{{this._id}}">
+                                    <input type="hidden" name="isStarted" value="true"/>
+                                    <input type="submit" value="Ga naar Race" />
+                                </form>
+                            </td>
+                         </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+
             </div>
         </div>
     </section>

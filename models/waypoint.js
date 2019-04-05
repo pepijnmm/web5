@@ -4,6 +4,12 @@ let waypointSchema = mongoose.Schema({
     _id: {
         type: String,
     },
+    name: {
+        type: String,
+    },
+    adress: {
+        type: String,
+    }
 });
 
 
