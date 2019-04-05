@@ -74,7 +74,7 @@
                             </div>
                             <div class="col-12">
                                 <div class="card">
-                                    <h3 class="card-header"><span class="fa fa-user"></span>Google</h3>
+                                    <h3 class="card-header"><span class="fa fa-google"></span>Google</h3>
 
                                      {{#if data.user.google.token}}
                                         <p class="card-body">
@@ -88,8 +88,26 @@
                                     {{/if}}
                                 </div>
                             </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <h3 class="card-header"><span class="fa fa-facebook"></span>Facebook</h3>
+
+                                     {{#if data.user.facebook.token}}
+                                        <p class="card-body">
+                                            <strong>id</strong>: {{data.user.facebook.id}}<br>
+                                            <strong>Name</strong>: {{data.user.facebook.name}}<br>
+                                            <strong>email</strong>: {{data.user.facebook.email}}<br>
+                                            <strong>Token</strong>: {{data.user.facebook.token}}<br>
+                                        </p>
+                                        <a href="/unlink/facebook" class="btn btn-default">Unlink</a>
+                                    {{else}}
+                                        <a href="/connect/facebook" class="btn btn-default">Connect Facebook</a>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>    
                         </div>
-                        
+                                  
                     </div>
                 </div>
             </div>

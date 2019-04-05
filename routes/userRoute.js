@@ -15,23 +15,28 @@ module.exports = function(app, passport) {
           if (!user) {
               return res.render('user/login', {layout:false, message: info});  
           }
-          res.cookie('token', info)
+          res.cookie('token', user)
           res.redirect('/profile');
         })(req, res, next);
       });
 
-      app.get('/profile', isVerified, function(req, res, next) { 
-
-        console.log('prof');
-        console.log(req.verifiedUser);
-
+      app.get('/profile', isVerified, function(req, res, next) {
+        
         if(req.verifiedUser)
         {
-          console.log('render');
-          return res.render('user/profile', {layout:false, data: req.verifiedUser});
+          if(req.query.message)
+          {
+            return res.render('user/profile', {layout:false, data: req.verifiedUser, message: req.query.message});
+          }
+          else{
+            return res.render('user/profile', {layout:false, data: req.verifiedUser});
+          }
+         
         }
         else{
+          console.log("facebook fout");
           res.redirect('/login');
+      
         }
       });
 
@@ -74,7 +79,7 @@ module.exports = function(app, passport) {
       });
 
       app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
-      app.get('/connect/google', passport.authorize('google', { scope : ['profile', 'email'] }));
+
       app.get('/auth/google/callback', function(req, res, next) {
         passport.authenticate('google', function(err, user, info) {
           if (err) {
@@ -83,12 +88,19 @@ module.exports = function(app, passport) {
           if (!user) {
               return res.render('user/login', {layout:false, message: info});  
           }
-
-          console.log(info);
-          res.cookie('token', info)
-          res.redirect('/profile');
+          res.cookie('token', user)
+          
+          if(info)
+          {
+            res.redirect('/profile?message=' + info);
+          }
+          else{
+            res.redirect('/profile');
+          }
         })(req, res, next);
       });
+
+      app.get('/connect/google', passport.authenticate('google', { scope : ['profile', 'email'] })); 
 
       app.get('/unlink/google', isVerified, function(req, res, next) {
         
@@ -105,6 +117,7 @@ module.exports = function(app, passport) {
               if(data.google)
               {
                 data.google.token = undefined;
+                data.google.id = undefined;
                 data.google.email = undefined;
                 data.save(function(err) {} );   
                 req.updatedUser = data;             
@@ -117,6 +130,62 @@ module.exports = function(app, passport) {
           }   
     }, updateJWT);
 
+    app.get('/unlink/facebook', isVerified, function(req, res, next) {
+        
+      var user = req.verifiedUser.user;       
+
+      if(user && user.facebook)
+        {
+         User.findById(user._id, function(err, data){
+            if(err)
+            {
+              res.redirect('/profile');
+            }
+            
+            if(data.facebook)
+            {
+              data.facebook.token = undefined;
+              data.facebook.id = undefined;
+              data.facebook.email = undefined;
+              data.save(function(err) {} );   
+              req.updatedUser = data;             
+            }
+            next(); 
+         });
+        } 
+        else{
+          next();
+        }   
+  }, updateJWT);
+
+    
+
+    app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['public_profile', 'email'] }));
+    app.get('/auth/facebook/callback', function(req, res, next) {
+      passport.authenticate('facebook', function(err, user, info) {
+        if (err) {
+          return res.render('user/login', {layout:false, message: err});  
+         }
+        if (!user) {
+          
+        console.log("ennexd");
+            return res.render('user/login', {layout:false, message: info});  
+        }
+
+        res.cookie('token', user)
+        
+        if(info)
+        {
+          res.redirect('/profile?message=' + info);
+        }
+        else{
+          res.redirect('/profile');
+        }
+      })(req, res, next);
+    });
+
+    app.get('/connect/facebook', passport.authenticate('facebook', { scope : ['public_profile', 'email'] }));
+    
       function isVerified(req, res, next) {
         const bearerToken = req.cookies['token']; 
         var user = null;
