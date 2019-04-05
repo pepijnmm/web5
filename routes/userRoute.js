@@ -12,7 +12,7 @@ module.exports = function(app, passport) {
         passport.authenticate('local-login', function(err, user, info) {
           if (err) { return next(err); }
           if (!user) { return res.redirect('/login'); }
-
+          res.cookie('token', info)
           res.json(info);
         })(req, res, next);
       });
