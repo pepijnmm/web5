@@ -21,9 +21,13 @@ module.exports = function(app, passport) {
       });
 
       app.get('/profile', isVerified, function(req, res, next) { 
-      
+
+        console.log('prof');
+        console.log(req.verifiedUser);
+
         if(req.verifiedUser)
         {
+          console.log('render');
           return res.render('user/profile', {layout:false, data: req.verifiedUser});
         }
         else{
@@ -79,10 +83,39 @@ module.exports = function(app, passport) {
           if (!user) {
               return res.render('user/login', {layout:false, message: info});  
           }
+
+          console.log(info);
           res.cookie('token', info)
           res.redirect('/profile');
         })(req, res, next);
       });
+
+      app.get('/unlink/google', isVerified, function(req, res, next) {
+        
+        var user = req.verifiedUser.user;       
+  
+        if(user && user.google)
+          {
+           User.findById(user._id, function(err, data){
+              if(err)
+              {
+                res.redirect('/profile');
+              }
+              
+              if(data.google)
+              {
+                data.google.token = undefined;
+                data.google.email = undefined;
+                data.save(function(err) {} );   
+                req.updatedUser = data;             
+              }
+              next(); 
+           });
+          } 
+          else{
+            next();
+          }   
+    }, updateJWT);
 
       function isVerified(req, res, next) {
         const bearerToken = req.cookies['token']; 

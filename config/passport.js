@@ -152,13 +152,10 @@ module.exports = function(passport) {
     },
     function(req, token, refreshToken, profile, done) {
         process.nextTick(function() {
-            const bearerHeader = req.headers['authorization'];
+            const bearerToken = req.cookies['token']; 
             var userToken = null;
     
-            if(typeof bearerHeader !== 'undefined'){
-                const bearer = bearerHeader.split(' ');
-                const bearerToken = bearer[1];
-    
+            if(typeof bearerToken !== 'undefined'){
                 jwt.verify(bearerToken, 'geheim', (err, data) => {
                     if(err)
                     {
@@ -218,31 +215,45 @@ module.exports = function(passport) {
                 });
 
             } else {
-        
-                User.findById(userToken.user.id, function(err, user)
+                console.log("else");
+                console.log(userToken.user);
+                User.findById(userToken.user._id, function(err, user)
                     {
                         if(err)
                         return done(err);
 
                         if(user)
                         {
-                            user.google.id = profile.id;
-                            user.google.token = token;
-                            user.google.name = profile.displayName;
-                            user.google.email = (profile.emails[0].value || '').toLowerCase();
-            
-                            user.save(function(err) {
-                                if (err){
-                                    return done(err);
+                            console.log("find");
+                            console.log(user);
+                            User.findOne({ 'google.email' : (profile.emails[0].value || '').toLowerCase()}, function(err, email){
+                                if(err)
+                                {}
+
+                                if(email)
+                                {
+                                    return done(null, null, "This google account is already in use");
                                 }
+                                else{
+                                    user.google.id = profile.id;
+                                    user.google.token = token;
+                                    user.google.name = profile.displayName;
+                                    user.google.email = (profile.emails[0].value || '').toLowerCase();
                                     
-                                jwt.sign({user: user}, 'geheim', (err, token) =>{
-                                    if(err)
-                                        return done(null, false, "Not logged in");
-                                    
-                                    return done(null, user, token);
-                                }); 
-                            });
+                                    user.save(function(err) {
+                                        if (err){
+                                            return done(err);
+                                        }
+                                            
+                                        jwt.sign({user: user}, 'geheim', (err, token) =>{
+                                            if(err)
+                                                return done(null, false, "Not logged in");
+                                            
+                                            return done(null, user, token);
+                                        }); 
+                                    });
+                                }
+                            })                    
                         }
                     })         
             }
