@@ -48,7 +48,7 @@
         <div class="container">
             <div class="row justify-content-center">
 
-                <div class="col-md-8">
+                <div class="col-12">
                     {{#if message}}
                     <div  class="alert alert-primary" role="alert">
                     {{message}}
@@ -56,43 +56,40 @@
                     {{/if}}
                 
                     <div class="card">
-                        <div class="card-header">Login</div>
-                            
-                        <div class="card-body">
-                            <form method="POST" action="/login" >
+                        <div class="card-header">Profile</div>             
+                        <div class="card-body">    
+                            <div class="col-12">
+                                <div class="card">
+                                    <h3 class="card-header"><span class="fa fa-user"></span> Local</h3>
 
-                                <div class="form-group row">
-                                    <label for="email" class="col-sm-4 col-form-label text-md-right">E-Mail</label>
-
-                                    <div class="col-md-6">
-                                        <input id="email" type="text" class="form-control" name="email" value="" required autofocus>
-                                    </div>
+                                     {{#if data.user.local.email}}
+                                        <p class="card-body">
+                                            <strong>email</strong>: {{data.user.local.email}}<br>
+                                        </p>
+                                        <a href="/unlink/local" class="btn btn-default">Unlink</a>
+                                    {{else}}
+                                        <a href="/connect/local" class="btn btn-default">Connect Local</a>
+                                    {{/if}}
                                 </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <h3 class="card-header"><span class="fa fa-user"></span>Google</h3>
 
-                                <div class="form-group row">
-                                    <label for="password" class="col-md-4 col-form-label text-md-right">Wachtwoord</label>
-
-                                    <div class="col-md-6">
-                                        <input id="password" type="password" class="form-control" name="password" required>
-                                    </div>
+                                     {{#if data.user.google.email}}
+                                        <p class="card-body">
+                                            <strong>Name</strong>: {{data.user.google.name}}<br>
+                                            <strong>email</strong>: {{data.user.google.email}}<br>
+                                            <strong>Token</strong>: {{data.user.google.token}}<br>
+                                        </p>
+                                        <a href="/unlink/google" class="btn btn-default">Unlink</a>
+                                    {{else}}
+                                        <a href="/connect/google" class="btn btn-default">Connect Google</a>
+                                    {{/if}}
                                 </div>
-
-                                <div class="form-group row mb-0">
-                                    <div class="col-md-8 offset-md-4">
-                                        <button type="submit" class="btn btn-primary">
-                                            Login
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                            <hr/>
-                            <a href="/signup">
-                                <button class="btn" >Registreer local</button>
-                            </a>
-                            <a href="http://localhost:3000/auth/google">
-                                <button class="btn" >Login google</button>
-                            </a>
+                            </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>

@@ -64,13 +64,10 @@ module.exports = function(passport) {
         }
           
         process.nextTick(function() {
-            const bearerHeader = req.headers['authorization'];
+            const bearerToken = req.cookies['token']; 
             var userToken = null;
     
-            if(typeof bearerHeader !== 'undefined'){
-                const bearer = bearerHeader.split(' ');
-                const bearerToken = bearer[1];
-    
+            if(typeof bearerToken !== 'undefined'){
                 jwt.verify(bearerToken, 'geheim', (err, data) => {
                     if(err)
                     {
@@ -114,9 +111,7 @@ module.exports = function(passport) {
 
                     } else {
                         User.findById(userToken.user._id, function(err, user)
-                    
-                    {
-                    
+                    { 
                         if(err)
                         return done(err);
 

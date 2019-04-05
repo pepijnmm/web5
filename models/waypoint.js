@@ -27,6 +27,7 @@ waypointSchema.query.byAdress = function (adr) {
     }
 };
 
+
 let Waypoint = mongoose.model('Waypoint', waypointSchema);
 
 module.exports = Waypoint;
