@@ -18,18 +18,35 @@ var jwt = require('jsonwebtoken');
  *         schema:
  *           type: array
  */
+router.all('*',isAdmin);
 router.get('/', needjson,verifyToken, racesController.get);
 router.get('/',needshtml, racesControllerhtml.get);
-router.get('/create', racesControllerhtml.getCreate);
-router.get('/:_id', racesControllerhtml.show);
-router.post('/location', racesController.getlocations);
+router.get('/create',needshtml, racesControllerhtml.getCreate);
+router.get('/:_id',needshtml, racesControllerhtml.show);
+router.post('/location',needjson, racesController.getlocations);
 
-router.get('/:_id', racesController.get);
-router.post('/', racesController.post);
-router.delete('/:_id', racesController.delete);
-router.put('/:_id', racesController.edit);
-router.put('/enable/:_id', racesController.accept);
+router.get('/:_id', needjson, racesController.get);
+router.post('/', needjson, racesController.post);
+router.delete('/:_id',needjson, racesController.delete);
+router.put('/:_id',needjson, racesController.edit);
+router.put('/enable/:_id',needjson, racesController.accept);
 
+function isAdmin(req, res, next)
+{
+    console.log('test');
+    //get auth header val
+    const bearerHeader = req.headers['authorization'];
+    if(typeof bearerHeader !== 'undefined'){
+        req.token = bearerHeader.replace("Bearer ","");
+        var decoded = jwt.verify(req.token, 'geheim');
+        if(decoded != null && decoded){
+            console.log(decoded.isAdmin);
+            app.locals.isAdmin = decoded.isAdmin;
+            next();
+        }
+    }
+        next();
+}
 function verifyToken(req, res, next)
 {
     //get auth header val

@@ -9,6 +9,7 @@ router.get('/:_id', waypointsController.get);
 router.post('/', waypointsController.post);
 router.delete('/:_id', waypointsController.delete);
 router.get('/:_oldid/waypoints', waypointsController.getRace);
+router.get('/:_oldid/waypoints/create', waypointsControllerhtml.getCreate);
 router.post('/', waypointsController.post);
 
 module.exports = router;

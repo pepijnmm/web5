@@ -16,7 +16,9 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <p>{{isAdmin}}</p>
                     {{#each data}}
+                        {{#if this.isStarted}}
                         <tr>
                             <td>{{this._id}}</td>
                             <td>
@@ -27,12 +29,13 @@
                                 {{/if}}
                             </td>
                             <td>
-                                <form action="/races/{{this._id}}">
-                                    <input type="hidden" name="isStarted" value="true"/>
-                                    <input type="submit" value="Ga naar Race" />
-                                </form>
+                                    <form action="/races/{{this._id}}">
+
+                                        <input type="submit" value="Ga naar Race" />
+                                    </form>
                             </td>
                          </tr>
+                    {{/if}}
                     {{/each}}
                     </tbody>
                 </table>

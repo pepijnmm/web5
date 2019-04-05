@@ -1,4 +1,4 @@
-jwt = localStorage.getItem('jwt');;
+jwt = document.cookie.split(";")[0].split("=")[1];
 $('form').submit(function(e) {
 if($(this).hasClass( "sendtoserver")) {
     e.preventDefault(); // ignore button
