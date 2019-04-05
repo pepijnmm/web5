@@ -33,23 +33,11 @@ module.exports = function(app, passport) {
 
       app.get('/unlink/local', isVerified, function(req, res, next) {
         
-        var user = req.verifiedUser.user;
-
-        newUser = User.findById(user._id, function(err, data){
-
-
-        });
-
-        
-        console.log("nummer 1");
-        console.log(newUser.lean());
-        
-
-
-        var newUser = null;
+        var user = req.verifiedUser.user;       
+  
         if(user && user.local)
           {
-           newUser = User.findById(user._id, function(err, data){
+           User.findById(user._id, function(err, data){
               if(err)
               {
                 res.redirect('/profile');
@@ -60,12 +48,14 @@ module.exports = function(app, passport) {
                 data.local.email = undefined;
                 data.local.password = undefined;
                 data.save(function(err) {} );   
-                // req.updatedUser = newUser.toObjecT();  
-              
+                req.updatedUser = data;             
               }
+              next(); 
            });
-          }    
-        next();
+          } 
+          else{
+            next();
+          }   
     }, updateJWT);
 
     app.get('/signup',function(req,res,next){res.render('user/signin',{layout:false});});
@@ -113,17 +103,19 @@ module.exports = function(app, passport) {
     }
 
     function updateJWT(req, res, next){
-
-        user = req.updatedUser;
-        console.log("?sad??");
-        console.log(user);
-
-       jwt.sign({user: user}, 'geheim', (err, token) =>{
-        if(err)
-            callback(null);
-        
-            callback(token);
-      }); 
+      user = req.updatedUser;
+      
+      if(user)
+      {
+        jwt.sign({user: user}, 'geheim', (err, token) =>{
+          if(err)
+              res.redirect('/profile');
+  
+              res.cookie('token', token);
+              res.redirect('/profile');
+        }); 
+      }else{
+        res.redirect('/profile');
+      }   
     }
-    
 }
