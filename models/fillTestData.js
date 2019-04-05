@@ -5,19 +5,41 @@ User = mongoose.model('User');
 
 let waypoint_seed = [
     {
-        name: "Kroeg 1",
+        _id: "Kroeg 1",
+        name: "van willemse",
+        adress: "straat 1",
     },
     {
-        name: "Kroeg 2",
+        _id: "Kroeg 2",
+        name: "van pietsr biertap",
+        adress: "straat 4",
+    },
+    {
+        _id: "Kroeg 3",
+        name: "peters pilsje",
+        adress: "straat 5",
+    },
+    {
+        _id: "Kroeg 4",
+        name: "hugos ontbijtje",
+        adress: "straat 6",
     }
 ];
 
 let race_seed = [
     {
         _id: "Race 1",
+        waypoints: [
+            "Kroeg 1"
+        ],
     },
     {
         _id: "Race 2",
+        waypoints: [
+            "Kroeg 2",
+            "Kroeg 3",
+            "Kroeg 4"
+        ]
     }
 ];
 
@@ -27,6 +49,13 @@ let user_seed = [
         email: "test123",
         password: "test123"
         }
+    },
+    {
+        local: {
+            email: "admin",
+            password: "admin"
+        },
+        isAdmin: true
     }
 ];
 
