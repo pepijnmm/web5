@@ -10,6 +10,9 @@ let raceSchema = mongoose.Schema({
         default: false,
     },
     waypoints: [{type: String, ref: 'Waypoint'}]
+},{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
 raceSchema.query.byPage = function (pageIndex, pageSize) {
@@ -17,6 +20,18 @@ raceSchema.query.byPage = function (pageIndex, pageSize) {
     pageSize = parseInt(pageSize) || 10;
     return this.find().skip(pageIndex * pageSize).limit(pageSize);
 };
+
+raceSchema.query.byStarted = function (started) {
+    if (countryCode) {
+        return this.find({ isStarted: started });
+    } else {
+        return this.find();
+    }
+};
+
+raceSchema.virtual('numberOfWaypoints').get(function () {
+    return this.waypoints.length;
+});
 
 let Race = mongoose.model('Race', raceSchema);
 
