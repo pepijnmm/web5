@@ -26,10 +26,6 @@ exports.get = function(req, res, next) {
 var unirest = require('unirest');
 
 exports.get = function(req, res, next) {
-  if(req.headers["Accept"] == undefined || req.headers["Accept"] != 'application/json') {
-  next();
-  return;
-  }
     var query = {};
 
 
@@ -104,19 +100,35 @@ exports.post = function(req, res, next) {
       }
     });
   }
+  exports.accept = function(req, res, next)
+  {
+    Race.findByIdAndUpdate(req.params._id, {isStarted: true}, {new: true}, (err, race) =>
+    {
+      if(err)
+      {
+        console.log(err);
+        res.status(500);
+        res.send();
+      }
+      else
+      {
+        return res.json(race);
+      }
+    });
+  }
 //adres = straat nummer postcode plaats land(in engels)   meters 500 kan goed
-exports.getlocations = function(adress, meters) {
+exports.getlocations = function(req, res, next) {
   const urllatlong = "https://nominatim.openstreetmap.org/search/search.php?q=",
       urllatlongend = "&format=json",
       stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];(",
       endcafes = ");out;";
 
-  if(req.body.adress && req.body.adress != ""){
+  if(req.body.adress && req.body.adress != "" && req.body.meters != ""){
   unirest.get(urllatlong + req.body.adress + urllatlongend).header("User-Agent", "racedrinkgame").header("Accept", "application/json").end(function (result) {
     if (result.body[0] != "" || result.body != undefined) {
       const lat = parseFloat(result.body[0]["lat"]),
           long = parseFloat(result.body[0]["lon"]);
-      unirest.get(stcafes + returncoords(lat, long, meters) + endcafes)
+      unirest.get(stcafes + returncoords(lat, long, req.body.meters) + endcafes)
           .end(function (result) {
             if (req.body["elements"] != null && req.body["elements"].length > 0){
               return result.body;

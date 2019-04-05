@@ -38,6 +38,7 @@ module.exports = function(passport) {
                     return done(null, false, "Wrong password");
                 }
                 else{
+                    user.local['password']=null;
                     jwt.sign({user: user}, 'geheim', (err, token) =>{
                         if(err)
                             return done(null, false, "Not logged in");

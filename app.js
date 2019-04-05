@@ -11,6 +11,7 @@ var passport = require('passport');
 const swaggerJSDoc = require('swagger-jsdoc');
 var swaggerRouter = require('./routes/api-docs');
 var racesRouter = require('./routes/racesRoute');
+var waypointsRouter = require('./routes/waypointsRoute');
 
 
 mongoose.connect('mongodb://localhost:27017/RestRace', { useNewUrlParser: true});
@@ -61,6 +62,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/races', racesRouter);
+app.use('/races', waypointsRouter);
 app.use('/', swaggerRouter);
 require('./routes/userRoute.js')(app, passport);
 
