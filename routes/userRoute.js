@@ -5,7 +5,27 @@ var mongoose = require('mongoose');
 module.exports = function(app, passport) {
   
 
-    app.get('/login',function(req,res,next){res.render('user/login',{layout:false});});
+    app.get('/login', isVerified, function(req,res,next){
+
+      if(req.verifiedUser)
+      {
+        res.redirect('/profile');
+      }
+      else{
+        res.render('user/login',{layout:false});
+      }  
+    });
+
+    app.get('/logout', isVerified, function(req,res,next){
+      if(req.verifiedUser)
+      {
+        res.clearCookie('token');
+        res.redirect('/login');
+      }
+      else{
+        red.redirect('/login');
+      }
+    });
 
     app.post('/login', function(req, res, next) {
         passport.authenticate('local-login', function(err, user, info) {
@@ -34,7 +54,7 @@ module.exports = function(app, passport) {
          
         }
         else{
-          console.log("facebook fout");
+          
           res.redirect('/login');
       
         }
@@ -71,10 +91,10 @@ module.exports = function(app, passport) {
     
     app.post('/signup', function(req, res, next) {
         passport.authenticate('local-signup', function(err, user, info) {
-          if (err) { return res.json(err); }
-          if (!user) { return res.json(info); }
+          if (err) return res.render('user/signin', {layout:false, message: err});  
+          if (!user) return res.render('user/signin', {layout:false, message: info});  
 
-          res.json(info);
+          return res.redirect('/login');
         })(req, res, next);
       });
 
@@ -90,7 +110,7 @@ module.exports = function(app, passport) {
           }
           res.cookie('token', user)
           
-          if(info)
+          if(info && Object.keys(info).length != 0)
           {
             res.redirect('/profile?message=' + info);
           }
@@ -99,6 +119,23 @@ module.exports = function(app, passport) {
           }
         })(req, res, next);
       });
+
+    app.get('/connect/local', function(req, res) {
+        res.render('user/localconnect', {layout:false});
+    });
+
+    app.post('/connect/local', function(req, res, next) {
+      passport.authenticate('local-signup', function(err, user, info) {
+        if (err) {
+          return res.render('user/localconnect', {layout:false, message: err});  
+         }
+        if (!user) {
+            return res.render('user/localconnect', {layout:false, message: info});  
+        }
+        res.cookie('token', user)
+        res.redirect('/profile');
+      })(req, res, next);
+    });
 
       app.get('/connect/google', passport.authenticate('google', { scope : ['profile', 'email'] })); 
 
@@ -158,6 +195,34 @@ module.exports = function(app, passport) {
         }   
   }, updateJWT);
 
+  app.get('/unlink/local', isVerified, function(req, res, next) {
+        
+    var user = req.verifiedUser.user;       
+
+    if(user && user.local)
+      {
+       User.findById(user._id, function(err, data){
+          if(err)
+          {
+            res.redirect('/profile');
+          }
+          
+          if(data.local)
+          {
+            data.local.email = undefined;
+            data.local.password = undefined;
+            data.save(function(err) {} );   
+            req.updatedUser = data;             
+          }
+          next(); 
+       });
+      } 
+      else{
+        next();
+      }   
+}, updateJWT);
+
+
     
 
     app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['public_profile', 'email'] }));
@@ -168,13 +233,12 @@ module.exports = function(app, passport) {
          }
         if (!user) {
           
-        console.log("ennexd");
             return res.render('user/login', {layout:false, message: info});  
         }
 
         res.cookie('token', user)
         
-        if(info)
+        if(info && Object.keys(info).length != 0)
         {
           res.redirect('/profile?message=' + info);
         }

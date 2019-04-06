@@ -7,15 +7,6 @@ var conf = require('./auth');
 var jwt = require('jsonwebtoken');
 
 module.exports = function(passport) {
-    passport.serializeUser(function(user, done) {
-        done(null, user.id);
-    });
-    passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
-            done(err, user);
-        });
-    });
-
     
     passport.use('local-login', new LocalStrategy({
         usernameField: 'email',
@@ -72,6 +63,7 @@ module.exports = function(passport) {
                 jwt.verify(bearerToken, 'geheim', (err, data) => {
                     if(err)
                     {
+                        return done(err)
                     }
                     else{
                      userToken = data;
@@ -156,6 +148,7 @@ module.exports = function(passport) {
                 jwt.verify(bearerToken, 'geheim', (err, data) => {
                     if(err)
                     {
+                        
                     }
                     else{
                      userToken = data;
@@ -242,7 +235,6 @@ module.exports = function(passport) {
                                         if(err)
                                             return done(null, false, "Not logged in");
                                         
-                                            console.log(user);
                                         return done(null, token, null);
                                     }); 
                                 });
@@ -342,7 +334,7 @@ module.exports = function(passport) {
         
                             User.findOne({ 'google.email' : (profile.emails[0].value || '').toLowerCase()}, function(err, email){
                                 if(err)
-                                {}
+                                {return done(err)}
 
                                 if(email)
                                 {
