@@ -28,10 +28,10 @@ var userSchema = mongoose.Schema({
     waypoints: [{type: String, ref: 'Waypoint'}],
 });
 
-userSchema.path('email').validate(function (email) {
-    var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-    return emailRegex.test(email.text);
- }, 'Email cant be empty')
+// userSchema.path('local.email').validate(function (email) {
+//     var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+//     return emailRegex.test(email.text);
+//  }, 'Email cant be empty')
 
 userSchema.methods.validPassword = function(password) {
     return password === this.local.password;

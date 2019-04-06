@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="NL_nl">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Beer game</title>
+
+    <!-- Scripts -->
+    <script src="/js/app.js/" defer></script>
+
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600" rel="stylesheet" type="text/css">
+
+    <!-- Styles -->
+    <link href="css/app.css" rel="stylesheet">
+</head>
+
+<body>
+<div id="app">
+    <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                Beer game
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Left Side Of Navbar -->
+                <ul class="navbar-nav mr-auto">
+
+                </ul>
+
+                <!-- Right Side Of Navbar -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Authentication Links -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+
+                <div class="col-12">
+                    {{#if message}}
+                    <div  class="alert alert-primary" role="alert">
+                    {{message}}
+                    </div>
+                    {{/if}}
+                
+                    <div class="card">
+                        <div class="card-header">Profile</div>             
+                        <div class="card-body">    
+                            <div class="col-12">
+                                <div class="card">
+                                    <h3 class="card-header"><span class="fa fa-user"></span> Local</h3>
+
+                                     {{#if data.user.local.email}}
+                                        <p class="card-body">
+                                            <strong>email</strong>: {{data.user.local.email}}<br>
+                                        </p>
+                                        <a href="/unlink/local" class="btn btn-default">Unlink</a>
+                                    {{else}}
+                                        <a href="/connect/local" class="btn btn-default">Connect Local</a>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <h3 class="card-header"><span class="fa fa-google"></span>Google</h3>
+
+                                     {{#if data.user.google.token}}
+                                        <p class="card-body">
+                                            <strong>Name</strong>: {{data.user.google.name}}<br>
+                                            <strong>email</strong>: {{data.user.google.email}}<br>
+                                            <strong>Token</strong>: {{data.user.google.token}}<br>
+                                        </p>
+                                        <a href="/unlink/google" class="btn btn-default">Unlink</a>
+                                    {{else}}
+                                        <a href="/connect/google" class="btn btn-default">Connect Google</a>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <h3 class="card-header"><span class="fa fa-facebook"></span>Facebook</h3>
+
+                                     {{#if data.user.facebook.token}}
+                                        <p class="card-body">
+                                            <strong>id</strong>: {{data.user.facebook.id}}<br>
+                                            <strong>Name</strong>: {{data.user.facebook.name}}<br>
+                                            <strong>email</strong>: {{data.user.facebook.email}}<br>
+                                            <strong>Token</strong>: {{data.user.facebook.token}}<br>
+                                        </p>
+                                        <a href="/unlink/facebook" class="btn btn-default">Unlink</a>
+                                    {{else}}
+                                        <a href="/connect/facebook" class="btn btn-default">Connect Facebook</a>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>    
+                        </div>
+                          <a href="/logout" class="btn btn-default">Uitloggen</a>         
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>
