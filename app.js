@@ -142,7 +142,6 @@ app.use('/', swaggerRouter);
 function isVerified(req, res, next) {
     const bearerToken = req.cookies['token'];
     checktoken(bearerToken).then((fullfill)=>{
-        console.log(fullfill);
         req.verifiedUser = fullfill;
         next();
     }, (reject)=>{
