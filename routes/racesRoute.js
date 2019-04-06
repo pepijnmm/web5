@@ -18,34 +18,27 @@ var jwt = require('jsonwebtoken');
  *         schema:
  *           type: array
  */
-router.get('/', needjson,verifyToken, racesController.get);
-router.get('/',needshtml, racesControllerhtml.get);
-router.get('/create', racesControllerhtml.getCreate);
-router.get('/:_id', racesControllerhtml.show);
-router.post('/location', racesController.getlocations);
+router.post('/location',needjson, racesController.getlocations);
+router.put('/enable/:_id',needjson,isAdmincheck, racesController.enable);
+ router.get('/', needjson, racesController.get);
+ router.get('/',needshtml, racesControllerhtml.get);
+ router.get('/create',needshtml, isAdmincheck, racesControllerhtml.getCreate);
+ router.get('/:_id',needshtml, racesControllerhtml.show);
+router.get('/:_id', needjson, racesController.get);
+router.post('/', needjson,isAdmincheck, racesController.post);
+router.delete('/:_id',needjson, isAdmincheck, racesController.delete);
+router.put('/:_id',needjson, isAdmincheck, racesController.edit);
 
-router.get('/:_id', racesController.get);
-router.post('/', racesController.post);
-router.delete('/:_id', racesController.delete);
-router.put('/:_id', racesController.edit);
-router.put('/enable/:_id', racesController.accept);
 
-
-function verifyToken(req, res, next)
+function isAdmincheck(req, res, next)
 {
-    //get auth header val
-    const bearerHeader = req.headers['authorization'];
-    if(typeof bearerHeader !== 'undefined'){
-        req.token = bearerHeader.replace("Bearer ","");
-        var decoded = jwt.verify(req.token, 'geheim');
-        if(decoded != null && decoded){
-            next();
-        }
-        else{
-            res.sendStatus(403);
-        }
-    }else{
-        res.sendStatus(403);
+    if(req.verifiedUser.user.isAdmin == true){
+        next();
+        return;
+    }
+    else{
+        res.render('error')
+        return false;
     }
 }
 function  needshtml(req, res, next) {
@@ -54,11 +47,11 @@ function  needshtml(req, res, next) {
     }
     else{next();}
 }
-    function  needjson(req, res, next) {
-        if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
-            next();
-        } else {
-            next('route');
-        }
+function  needjson(req, res, next) {
+    if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
+        next();
+    } else {
+        next('route');
     }
+}
 module.exports = router;

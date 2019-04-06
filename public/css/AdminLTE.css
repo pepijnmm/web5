@@ -23,6 +23,9 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
+.changemap{
+  margin-left:20px;
+}
 /* Layout */
 .wrapper {
   height: 100%;

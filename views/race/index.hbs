@@ -11,28 +11,50 @@
                     <thead>
                     <tr>
                         <th>naam</th>
-                        <th>Aan</th>
+                        {{#if isAdmin}}<th>Aan</th>{{/if}}
                         <th>opties</th>
                     </tr>
                     </thead>
                     <tbody>
                     {{#each data}}
+                        {{#if this.isStarted}}
                         <tr>
                             <td>{{this._id}}</td>
-                            <td>
+                        {{#if ../isAdmin}}<td>
                                 {{#if this.isStarted}}
                                         ja
                                 {{else}}
                                         nee
                                 {{/if}}
-                            </td>
+                        </td>{{/if}}
                             <td>
-                                <form action="/races/{{this._id}}">
-                                    <input type="hidden" name="isStarted" value="true"/>
-                                    <input type="submit" value="Ga naar Race" />
-                                </form>
+                                    <form action="/races/{{this._id}}">
+
+                                        <input type="submit" value="Ga naar Race" />
+                                    </form>
                             </td>
                          </tr>
+                        {{else}}
+                            {{#if ../isAdmin}}
+                            <tr>
+                                <td>{{this._id}}</td>
+                                <td>
+                                    {{#if this.isStarted}}
+                                        ja
+                                    {{else}}
+                                        nee
+                                    {{/if}}
+                                </td>
+                                <td>
+                                    <form action="/races/{{this._id}}">
+
+                                        <input type="submit" value="Ga naar Race" />
+                                    </form>
+                                </td>
+                            </tr>
+                        {{/if}}
+                    {{/if}}
+
                     {{/each}}
                     </tbody>
                 </table>

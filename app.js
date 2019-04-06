@@ -8,11 +8,19 @@ var jwt = require('jsonwebtoken');
 var session = require('express-session');
 var passport = require('passport');
 var flash = require('connect-flash');
+var exphbs  = require('express-handlebars');
+var cookie = require('cookie');
 
 const swaggerJSDoc = require('swagger-jsdoc');
 var swaggerRouter = require('./routes/api-docs');
 var racesRouter = require('./routes/racesRoute');
 var waypointsRouter = require('./routes/waypointsRoute');
+
+var app = express();
+
+
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 
 
 mongoose.connect('mongodb://localhost:27017/RestRace', { useNewUrlParser: true});
@@ -41,17 +49,68 @@ mongoose.set('useFindAndModify', false);
 
 require('./config/passport')(passport);
 
-var app = express();
+
+// var hbs = exphbs.create({
+//     extname: '.hbs',
+//     //layoutsDir: path.join(__dirname, '/views'),
+//     //defaultLayout: 'layout'
+// });
+//
+
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+//app.engine('hbs', exphbs({layoutsDir: path.join(__dirname, '/views'),extname: '.hbs',defaultLayout: 'layout'}));
+//app.set('view engine', 'hbs');
+var hbs = exphbs.create({
+    layoutsDir: path.join(__dirname, '/views'),
+    defaultLayout: 'layout',
+    extname: '.hbs',
+    // Specify helpers which are only registered on this instance.
+    helpers: {
+        ifcond: function (v1, operator, v2, options) {
+
+            switch (operator) {
+                case '==':
+                    return (v1 == v2) ? options.fn(this) : options.inverse(this);
+                case '===':
+                    return (v1 === v2) ? options.fn(this) : options.inverse(this);
+                case '!=':
+                    return (v1 != v2) ? options.fn(this) : options.inverse(this);
+                case '!==':
+                    return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+                case '<':
+                    return (v1 < v2) ? options.fn(this) : options.inverse(this);
+                case '<=':
+                    return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+                case '>':
+                    return (v1 > v2) ? options.fn(this) : options.inverse(this);
+                case '>=':
+                    return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+                case '&&':
+                    return (v1 && v2) ? options.fn(this) : options.inverse(this);
+                case '||':
+                    return (v1 || v2) ? options.fn(this) : options.inverse(this);
+                default:
+                    return options.inverse(this);
+            }
+        }
+    }
+});
+
+app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
+
+//app.set('views', path.join(__dirname, '/views'));
+//app.engine('handlebars', exphbs());
+//app.set('view engine', 'handlebars');
+
+
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(session({
   secret: 'ilovescotchscotchyscotchscotch', // session secret
@@ -59,15 +118,67 @@ app.use(session({
   saveUninitialized: true
 }));
 
+io.sockets
+    .on('connection', function(socket,req){
+    var cookies = cookie.parse(socket.handshake.headers.cookie);
+    console.log(app.locals.isAdmin);
+    console.log(req.verifiedUser );
+    if(checktoken(cookies.token)){
+        socket.on('joinroom',function(data,callback) {
+            socket.join('login');
+
+        });
+    }
+    else{
+        socket.join('notlogedin');
+    }
+});
+
+
 app.use(passport.initialize());
 app.use(passport.session());
-
+require('./routes/userRoute.js')(app, passport);
+app.use('/', swaggerRouter);
+function isVerified(req, res, next) {
+    const bearerToken = req.cookies['token'];
+    checktoken(bearerToken).then((fullfill)=>{
+        console.log(fullfill);
+        req.verifiedUser = fullfill;
+        next();
+    }, (reject)=>{
+        res.redirect('/login');
+        return false;
+    });
+}
+async function checktoken(token) {
+        return new Promise((resolve, reject) => {
+            if (typeof token !== 'undefined') {
+                token = jwt.verify(token, 'geheim', (err, data) => {
+                    if(err){
+                        reject();}
+                    else{
+                        app.locals.isAdmin = data.user.isAdmin;
+                        resolve(data);
+                    }});
+            } else {
+                reject();
+            }
+        });
+}
+app.use(function(req, res, next){
+    res.io = io;
+    next();
+});
+app.use('/', isVerified);
 app.use('/races', racesRouter);
 app.use('/races', waypointsRouter);
-app.use('/', swaggerRouter);
+//app.use('/', swaggerRouter);
 
 
 require('./routes/userRoute.js')(app, passport);
+app.get('*', function(req, res){
+    res.render('error',{message:"pagina niet gevonden", error:{status:404}});
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -85,4 +196,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+module.exports = {app: app, server: server};

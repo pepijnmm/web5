@@ -27,14 +27,4 @@ module.exports = function(app, passport) {
     app.get('/auth/google/callback', userController.googleCallback);
     app.get('/auth/facebook/callback', userController.facebookCallback);
 
-
-     
-    
-    
-
-  
-    
- 
-    
-
 }

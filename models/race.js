@@ -9,7 +9,7 @@ let raceSchema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    waypoints: [{type: String, ref: 'Waypoint'}]
+    waypoints: [{type: Number, ref: 'Waypoint'}]
 },{
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
