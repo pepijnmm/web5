@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 var jwt = require('jsonwebtoken');
 var session = require('express-session');
 var passport = require('passport');
+var flash = require('connect-flash');
 var exphbs  = require('express-handlebars');
 
 const swaggerJSDoc = require('swagger-jsdoc');
