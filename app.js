@@ -172,6 +172,10 @@ app.use(function(req, res, next){
 app.use('/', isVerified);
 app.use('/races', racesRouter);
 app.use('/races', waypointsRouter);
+//app.use('/', swaggerRouter);
+
+
+require('./routes/userRoute.js')(app, passport);
 app.get('*', function(req, res){
     res.render('error',{message:"pagina niet gevonden", error:{status:404}});
 });

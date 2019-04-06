@@ -22,7 +22,7 @@ raceSchema.query.byPage = function (pageIndex, pageSize) {
 };
 
 raceSchema.query.byStarted = function (started) {
-    if (countryCode) {
+    if (started) {
         return this.find({ isStarted: started });
     } else {
         return this.find();

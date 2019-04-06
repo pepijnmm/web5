@@ -4,11 +4,19 @@ let waypointSchema = mongoose.Schema({
     _id: {
         type: Number,
     },
+
+    name: {
+        type: String,
+        maxLength: 255,
+        required: true
+    },
+    adress: {
+        type: String,
+    },
     order: {
         type: Number,
     }
 });
-
 
 waypointSchema.query.byPage = function (pageIndex, pageSize) {
     pageIndex = pageIndex || 0;
@@ -17,7 +25,7 @@ waypointSchema.query.byPage = function (pageIndex, pageSize) {
 };
 
 waypointSchema.query.byAdress = function (adr) {
-    if (fullName) {
+    if (adr) {
         return this.find({ adress: adr });
     } else {
         return this.find();
