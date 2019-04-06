@@ -65,6 +65,8 @@ app.use(passport.session());
 app.use('/races', racesRouter);
 app.use('/races', waypointsRouter);
 app.use('/', swaggerRouter);
+
+
 require('./routes/userRoute.js')(app, passport);
 
 // catch 404 and forward to error handler

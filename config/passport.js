@@ -331,7 +331,6 @@ module.exports = function(passport) {
 
                         if(user)
                         {
-        
                             User.findOne({ 'google.email' : (profile.emails[0].value || '').toLowerCase()}, function(err, email){
                                 if(err)
                                 {return done(err)}

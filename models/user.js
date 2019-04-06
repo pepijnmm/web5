@@ -61,26 +61,51 @@ var userSchema = mongoose.Schema({
 });
 
 userSchema.path('local.email').validate(function (email) {
-    var emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-    console.log(email);
-    console.log('validatie');
-    return emailRegex.test(email);
+    if(email)
+    {
+        var emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+        return true;//emailRegex.test(email);
+    }
+   return true;
+
  }, 'Email is not in the right format')
 
- userSchema.path('local.password').validate(function (password) {
-    var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return passwordRegex.test(password);
- }, 'Password must be 8 characters, atleast 1 number and 1 letter ')
+//  userSchema.path('local.password').validate(function (password) {
+//     console.log("password validatie");
+//     console.log(password);
+//     console.log("local pass::")
+//     console.log(this.password);
+
+//     if(password && password !== this.password)
+//     {
+//         var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+//         return true;//passwordRegex.test(password);
+//     }
+//     else{
+//         return true;
+//     }
+   
+//  }, 'Password must be 8 characters, atleast 1 number and 1 letter ')
 
  userSchema.pre('save', function(next) {
     var user = this;
 
-    if (!user.isModified('local.password')) return next();
+    if (!user.isModified('local.password'))
+    {
+        return next();
+    }
+    else{
+        console.log(user);
+        var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        if(!passwordRegex.test(user.local.password))
+        {
+            console.log("klopt geen hout van");
+        }
+    } 
 
     bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
         if (err) return next(err);
 
-        // hash the password using our new salt
         bcrypt.hash(user.local.password, salt, null, function(err, hash) {
             if (err) return next(err);
 
