@@ -30,7 +30,8 @@ module.exports = function(app, passport) {
     app.post('/login', function(req, res, next) {
         passport.authenticate('local-login', function(err, user, info) {
           if (err) {
-            return res.render('user/login', {layout:false, message: err});  
+            
+            return res.render('user/login', {layout:false, message: err.message});  
            }
           if (!user) {
               return res.render('user/login', {layout:false, message: info});  
@@ -91,7 +92,8 @@ module.exports = function(app, passport) {
     
     app.post('/signup', function(req, res, next) {
         passport.authenticate('local-signup', function(err, user, info) {
-          if (err) return res.render('user/signin', {layout:false, message: err});  
+          if (err) {
+            return res.render('user/signin', {layout:false, message: err.message});}  
           if (!user) return res.render('user/signin', {layout:false, message: info});  
 
           return res.redirect('/login');
@@ -103,7 +105,7 @@ module.exports = function(app, passport) {
       app.get('/auth/google/callback', function(req, res, next) {
         passport.authenticate('google', function(err, user, info) {
           if (err) {
-            return res.render('user/login', {layout:false, message: err});  
+            return res.render('user/login', {layout:false, message: err.message});  
            }
           if (!user) {
               return res.render('user/login', {layout:false, message: info});  
@@ -127,7 +129,7 @@ module.exports = function(app, passport) {
     app.post('/connect/local', function(req, res, next) {
       passport.authenticate('local-signup', function(err, user, info) {
         if (err) {
-          return res.render('user/localconnect', {layout:false, message: err});  
+          return res.render('user/localconnect', {layout:false, message: err.message});  
          }
         if (!user) {
             return res.render('user/localconnect', {layout:false, message: info});  
@@ -229,7 +231,7 @@ module.exports = function(app, passport) {
     app.get('/auth/facebook/callback', function(req, res, next) {
       passport.authenticate('facebook', function(err, user, info) {
         if (err) {
-          return res.render('user/login', {layout:false, message: err});  
+          return res.render('user/login', {layout:false, message: err.message});  
          }
         if (!user) {
           
