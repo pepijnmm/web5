@@ -151,17 +151,15 @@ function isVerified(req, res, next) {
     });
 }
 async function checktoken(token) {
-    console.log('hier');
         return new Promise((resolve, reject) => {
             if (typeof token !== 'undefined') {
-                jwt.verify(token, 'geheim').then((err,data)=>{
-                    if (err) {
-                        reject();
-                    } else {
+                token = jwt.verify(token, 'geheim', (err, data) => {
+                    if(err){
+                        reject();}
+                    else{
                         app.locals.isAdmin = data.user.isAdmin;
                         resolve(data);
-                    }
-                });
+                    }});
             } else {
                 reject();
             }
