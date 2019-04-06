@@ -35,7 +35,7 @@ module.exports = function(app, passport) {
           if (!user) {
               return res.render('user/login', {layout:false, message: info});  
           }
-          res.cookie('token', user)
+          res.cookie('token', user);
           res.redirect('/profile');
         })(req, res, next);
       });

@@ -9,11 +9,18 @@ var session = require('express-session');
 var passport = require('passport');
 var flash = require('connect-flash');
 var exphbs  = require('express-handlebars');
+var cookie = require('cookie');
 
 const swaggerJSDoc = require('swagger-jsdoc');
 var swaggerRouter = require('./routes/api-docs');
 var racesRouter = require('./routes/racesRoute');
 var waypointsRouter = require('./routes/waypointsRoute');
+
+var app = express();
+
+
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 
 
 mongoose.connect('mongodb://localhost:27017/RestRace', { useNewUrlParser: true});
@@ -42,7 +49,6 @@ mongoose.set('useFindAndModify', false);
 
 require('./config/passport')(passport);
 
-var app = express();
 
 // var hbs = exphbs.create({
 //     extname: '.hbs',
@@ -112,33 +118,59 @@ app.use(session({
   saveUninitialized: true
 }));
 
+io.sockets
+    .on('connection', function(socket,req){
+    var cookies = cookie.parse(socket.handshake.headers.cookie);
+    console.log(app.locals.isAdmin);
+    console.log(req.verifiedUser );
+    if(checktoken(cookies.token)){
+        socket.on('joinroom',function(data,callback) {
+            socket.join('login');
+
+        });
+    }
+    else{
+        socket.join('notlogedin');
+    }
+});
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 require('./routes/userRoute.js')(app, passport);
 app.use('/', swaggerRouter);
 function isVerified(req, res, next) {
     const bearerToken = req.cookies['token'];
-    var user = null;
-
-    if(typeof bearerToken !== 'undefined'){
-        jwt.verify(bearerToken, 'geheim', (err, data) => {
-            if(err)
-            {}
-            else{
-                user = data;
-                req.verifiedUser = user;
-                app.locals.isAdmin = data.user.isAdmin;
-                next();
-                return;
-            }
-        });
-
-    }
-    else {
+    checktoken(bearerToken).then((fullfill)=>{
+        console.log(fullfill);
+        req.verifiedUser = fullfill;
+        next();
+    }, (reject)=>{
         res.redirect('/login');
         return false;
-    }
+    });
 }
+async function checktoken(token) {
+    console.log('hier');
+        return new Promise((resolve, reject) => {
+            if (typeof token !== 'undefined') {
+                jwt.verify(token, 'geheim').then((err,data)=>{
+                    if (err) {
+                        reject();
+                    } else {
+                        app.locals.isAdmin = data.user.isAdmin;
+                        resolve(data);
+                    }
+                });
+            } else {
+                reject();
+            }
+        });
+}
+app.use(function(req, res, next){
+    res.io = io;
+    next();
+});
 app.use('/', isVerified);
 app.use('/races', racesRouter);
 app.use('/races', waypointsRouter);
@@ -162,4 +194,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+module.exports = {app: app, server: server};

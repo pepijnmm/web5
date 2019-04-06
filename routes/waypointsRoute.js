@@ -10,8 +10,8 @@ router.post('/:_oldid/waypoints/create',isAdmincheck, waypointsController.posts)
 router.post('/:_oldid/waypoints/check/:_id', waypointsController.check);
 router.get('/', waypointsController.get);
 router.get('/:_id', waypointsController.get);
-router.post('/', waypointsController.post);
-router.delete('/:_id', waypointsController.delete);
+router.post('/',isAdmincheck, waypointsController.post);
+router.delete('/:_id',isAdmincheck, waypointsController.delete);
 
 router.post('/', waypointsController.post);
 

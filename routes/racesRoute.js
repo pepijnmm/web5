@@ -41,14 +41,12 @@ function isAdmincheck(req, res, next)
     }
 }
 function  needshtml(req, res, next) {
-    console.log('nu hier');
     if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
         next('route')
     }
     else{next();}
 }
 function  needjson(req, res, next) {
-    console.log('ik ben heir');
     if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
         next();
     } else {

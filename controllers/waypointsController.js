@@ -89,9 +89,15 @@ exports.check = function(req, res, next) {
   var user = req.verifiedUser.user;
   user = User.findById(user._id);
   user.then(user_data => {
-    user_data.waypoints.push(req.params._oldid+'.'+req.params._id)
-    user_data.save();
-    return res.json(true);
+    if(!user_data.waypoints.includes(req.params._oldid + '.' + req.params._id)) {
+      res.io.emit(req.params._oldid+"_waypoint."+req.params._id, user_data.id);
+      user_data.waypoints.push(req.params._oldid + '.' + req.params._id);
+      user_data.save();
+      return res.json(true);
+    }
+    else{
+      return res.status(500);
+    }
   });
 }
 exports.post = function(req, res, next) {
