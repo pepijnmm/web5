@@ -64,7 +64,7 @@ userSchema.path('local.email').validate(function (email) {
     if(email)
     {
         var emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-        return true;//emailRegex.test(email);
+        return emailRegex.test(email);
     }
    return true;
 
@@ -90,22 +90,29 @@ userSchema.path('local.email').validate(function (email) {
  userSchema.pre('save', function(next) {
     var user = this;
 
-    if (!user.isModified('local.password'))
+    if (!this.isNew)
     {
         return next();
     }
     else{
-        console.log(user);
-        var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-        if(!passwordRegex.test(user.local.password))
+        console.log(user.local.password);
+        console.log(user.local);
+        console.log(user)
+
+        if(user.local.password)
         {
-            console.log("klopt geen hout van");
+            var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            if(!passwordRegex.test(user.local.password))
+            {
+                console.log("fout");
+                throw new Error('Password must be length of 8 and contain 1 letter and 1 number');
+                return;
+            }
         }
     } 
 
     bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
         if (err) return next(err);
-
         bcrypt.hash(user.local.password, salt, null, function(err, hash) {
             if (err) return next(err);
 
@@ -115,9 +122,16 @@ userSchema.path('local.email').validate(function (email) {
     });
 });
 
+
+
 userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.local.password); 
 };
+
+userSchema.methods.hashPassword = function(password)
+{
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+}
 
 let User = mongoose.model('User', userSchema);
 
