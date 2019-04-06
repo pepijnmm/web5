@@ -24,11 +24,10 @@ var userSchema = mongoose.Schema({
         type: Boolean,
         required: true
     },
-    races: [{type: String, ref: 'Race'}],
-    waypoints: [{type: String, ref: 'Waypoint'}],
+    waypoints: [{type: String}],
 });
 
-// userSchema.path('local.email').validate(function (email) {
+// userSchema.path('email').validate(function (email) {
 //     var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
 //     return emailRegex.test(email.text);
 //  }, 'Email cant be empty')

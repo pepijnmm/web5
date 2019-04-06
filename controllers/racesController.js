@@ -1,33 +1,34 @@
 var mongoose = require('mongoose');
 var Race = require('../models/race');
 var express = require('express');
-
+var unirest = require('unirest');
 var jwt = require('jsonwebtoken');
 
-exports.get = function(req, res, next) {
-  jwt.verify(req.token, 'geheim', (err, data) => {
-    if(err)
-    {
-      res.sendStatus(403);
-    }else{
-      
-    }
-  })
+// exports.get = function(req, res, next) {
+//   jwt.verify(req.token, 'geheim', (err, data) => {
+//     if(err)
+//     {
+//       res.sendStatus(403);
+//     }else{
+//
+//     }
+//   })
+//
+//   var query = {};
+//
+// 	if(req.params._id){
+// 		query._id = req.params._id;
+//   }
+//
+//   var result = Race.find(query)
+//   .byPage(req.query.pageIndex, req.query.pageSize);
+// }
 
-  var query = {};
 
-	if(req.params._id){
-		query._id = req.params._id;
-  } 
-  
-  var result = Race.find(query)
-  .byPage(req.query.pageIndex, req.query.pageSize);
-}
-var unirest = require('unirest');
+
 
 exports.get = function(req, res, next) {
     var query = {};
-
 
     if (req.params._id) {
       query._id = req.params._id;
@@ -48,6 +49,7 @@ exports.get = function(req, res, next) {
     });
 
   }
+
 exports.post = function(req, res, next) {
   var race = new Race(req.body);
   race.save(function(err)
@@ -100,7 +102,7 @@ exports.post = function(req, res, next) {
       }
     });
   }
-  exports.accept = function(req, res, next)
+  exports.enable = function(req, res, next)
   {
     Race.findByIdAndUpdate(req.params._id, {isStarted: true}, {new: true}, (err, race) =>
     {
@@ -116,13 +118,31 @@ exports.post = function(req, res, next) {
       }
     });
   }
+//id = id van een plaats
+exports.getlocation = function(req, res, next) {
+  const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];";
+  if (!(req.body.id && req.body.id != "")) {
+    return;
+  }
+  query = "";
+  req.body.id.each((data) => {
+    query+="node(id:"+data+");out;";
+  })
+  unirest.get(stcafes + query)
+      .end(function (result) {
+        if (result.body.elements != null && result.body.elements.length > 0) {
+          return res.json(result.body.elements[0]);
+        } else {
+          return res.json(null);
+        }
+      });
+};
 //adres = straat nummer postcode plaats land(in engels)   meters 500 kan goed
 exports.getlocations = function(req, res, next) {
   const urllatlong = "https://nominatim.openstreetmap.org/search/search.php?q=",
       urllatlongend = "&format=json",
-      stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];(",
-      endcafes = ");out;";
-
+      stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];",
+      endcafes = "";
   if(req.body.adress && req.body.adress != "" && req.body.meters != ""){
   unirest.get(urllatlong + req.body.adress + urllatlongend).header("User-Agent", "racedrinkgame").header("Accept", "application/json").end(function (result) {
     if (result.body[0] != "" || result.body != undefined) {
@@ -130,15 +150,15 @@ exports.getlocations = function(req, res, next) {
           long = parseFloat(result.body[0]["lon"]);
       unirest.get(stcafes + returncoords(lat, long, req.body.meters) + endcafes)
           .end(function (result) {
-            if (req.body["elements"] != null && req.body["elements"].length > 0){
-              return result.body;
+            if (result.body.elements != null && result.body.elements.length > 0){
+              return res.json(result.body.elements);
             }
             else{
-              return false;
+              return res.json(null);
             }
           });
     } else {
-      return null;
+      return res.json(null);
     }
   });
 }
@@ -146,13 +166,13 @@ exports.getlocations = function(req, res, next) {
     
  
 function returncoords(lat,long, distance){
-  return "node[amenity=pub](around:"+distance+","+lat+","+long+");" +
-      "way[amenity=pub](around:"+distance+","+lat+","+long+");" +
-      "relation[amenity=pub](around:"+distance+","+lat+","+long+");" +
-      "node[amenity=cafe](around:"+distance+","+lat+","+long+");" +
-      "way[amenity=cafe](around:"+distance+","+lat+","+long+");" +
-      "relation[amenity=cafe](around:"+distance+","+lat+","+long+");" +
-      "node[amenity=bar](around:"+distance+","+lat+","+long+");" +
-      "way[amenity=bar](around:"+distance+","+lat+","+long+");" +
-      "relation[amenity=bar](around:"+distance+","+lat+","+long+");";
+  return "node[amenity=pub](around:"+distance+","+lat+","+long+");out;" +
+      "way[amenity=pub](around:"+distance+","+lat+","+long+");out;" +
+      "relation[amenity=pub](around:"+distance+","+lat+","+long+");out;" +
+      "node[amenity=cafe](around:"+distance+","+lat+","+long+");out;" +
+      "way[amenity=cafe](around:"+distance+","+lat+","+long+");out;" +
+      "relation[amenity=cafe](around:"+distance+","+lat+","+long+");out;" +
+      "node[amenity=bar](around:"+distance+","+lat+","+long+");out;" +
+      "way[amenity=bar](around:"+distance+","+lat+","+long+");out;" +
+      "relation[amenity=bar](around:"+distance+","+lat+","+long+");out;";
 }

@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Waypoint = require('../models/waypoint');
 var Race = require('../models/race');
 var express = require('express');
+var User = require('../models/user');
 
 exports.get = function(req, res, next) {
   var query = {};
@@ -29,33 +30,73 @@ exports.get = function(req, res, next) {
 exports.getRace = function(req, res, next) {
   var query = {};
 
-  if(req.params._oldid){
+  if(req.params._oldid) {
     query._id = req.params._oldid;
-  }
-  var result = Race.find(query);
-  result.then(data => {
-    if (data[0].waypoints.length > 0) {
-      arr = [];
-      data[0].waypoints.forEach(element => {
-        arr.push(element)
-      });
-      var result = Waypoint.where('_id').in( arr)
-         .byPage(req.query.pageIndex, req.query.pageSize);
+    var result = Race.find(query);
+    result.then(data => {
+      if (data[0].waypoints.length > 0) {
+        arr = [];
+        data[0].waypoints.forEach(element => {
+          arr.push(element)
+        });
+        var result = Waypoint.where('_id').in(arr)
+            .byPage(req.query.pageIndex, req.query.pageSize);
 
-      result.then(data => {
-        if (req.params._id) {
-          data = data[0];
-        }
+        result.then(data => {
+          if (req.params._id) {
+            data = data[0];
+          }
 
-        return res.render('waypoint/index',{data: data});
-      }).catch(err => {
-        console.log(err);
-        res.status(err.status || 500);
+          return res.render('waypoint/index', {data: data, _oldid: req.params._oldid});
+        }).catch(err => {
+          console.log(err);
+          res.status(err.status || 500);
+          res.render('error');
+        });
+      } else {
         res.render('error');
+      }
+    });
+  }
+  else{
+    res.render('error')
+  }
+}
+exports.posts = function(req, res, next) {
+  if(req.body.bars != undefined && req.body.bars.length > 0 && req.params._oldid != undefined) {
+    var i = 0;
+    if(!Array.isArray(req.body.bars)){
+      req.body.bars = [req.body.bars];
+    }
+    var result = Race.findById(req.params._oldid);
+    result.then(data => {
+      var i = data.waypoints.length;
+      req.body.bars.forEach((data2)=>{
+        console.log(i);
+        console.log(data2);
+        data.waypoints.push(data2);
+        data.save();
+        var waypoint = new Waypoint({_id: data2, order: ++i});
+        i++;
+        waypoint.save(function (err) {
+        });
       });
+      return res.json(true);
+    });
+  }
+}
+exports.check = function(req, res, next) {
+  var user = req.verifiedUser.user;
+  user = User.findById(user._id);
+  user.then(user_data => {
+    if(!user_data.waypoints.includes(req.params._oldid + '.' + req.params._id)) {
+      res.io.emit(req.params._oldid+"_waypoint."+req.params._id, user_data.id);
+      user_data.waypoints.push(req.params._oldid + '.' + req.params._id);
+      user_data.save();
+      return res.json(true);
     }
     else{
-      res.render('error');
+      return res.status(500);
     }
   });
 }
