@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Waypoint = require('../models/waypoint');
 var Race = require('../models/race');
 var express = require('express');
+var User = require('../models/user');
 
 exports.get = function(req, res, next) {
   var query = {};
@@ -83,6 +84,15 @@ exports.posts = function(req, res, next) {
       return res.json(true);
     });
   }
+}
+exports.check = function(req, res, next) {
+  var user = req.verifiedUser.user;
+  user = User.findById(user._id);
+  user.then(user_data => {
+    user_data.waypoints.push(req.params._oldid+'.'+req.params._id)
+    user_data.save();
+    return res.json(true);
+  });
 }
 exports.post = function(req, res, next) {
   var waypoint = new Waypoint(req.body);

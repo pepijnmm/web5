@@ -114,11 +114,37 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+require('./routes/userRoute.js')(app, passport);
+app.use('/', swaggerRouter);
+function isVerified(req, res, next) {
+    const bearerToken = req.cookies['token'];
+    var user = null;
 
+    if(typeof bearerToken !== 'undefined'){
+        jwt.verify(bearerToken, 'geheim', (err, data) => {
+            if(err)
+            {}
+            else{
+                user = data;
+                req.verifiedUser = user;
+                app.locals.isAdmin = data.user.isAdmin;
+                next();
+                return;
+            }
+        });
+
+    }
+    else {
+        res.redirect('/login');
+        return false;
+    }
+}
+app.use('/', isVerified);
 app.use('/races', racesRouter);
 app.use('/races', waypointsRouter);
-app.use('/', swaggerRouter);
-require('./routes/userRoute.js')(app, passport);
+app.get('*', function(req, res){
+    res.render('error',{message:"pagina niet gevonden", error:{status:404}});
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

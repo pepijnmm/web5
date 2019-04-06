@@ -18,62 +18,41 @@ var jwt = require('jsonwebtoken');
  *         schema:
  *           type: array
  */
-router.all('*',isAdmin);
 router.post('/location',needjson, racesController.getlocations);
- router.get('/', needjson,verifyToken, racesController.get);
+router.put('/enable/:_id',needjson,isAdmincheck, racesController.enable);
+ router.get('/', needjson, racesController.get);
  router.get('/',needshtml, racesControllerhtml.get);
- router.get('/:_id/create',needshtml, racesControllerhtml.getCreate);
+ router.get('/create',needshtml, isAdmincheck, racesControllerhtml.getCreate);
  router.get('/:_id',needshtml, racesControllerhtml.show);
 router.get('/:_id', needjson, racesController.get);
-router.post('/', needjson, racesController.post);
-router.delete('/:_id',needjson, racesController.delete);
-router.put('/:_id',needjson, racesController.edit);
-router.put('/enable/:_id',needjson, racesController.accept);
+router.post('/', needjson,isAdmincheck, racesController.post);
+router.delete('/:_id',needjson, isAdmincheck, racesController.delete);
+router.put('/:_id',needjson, isAdmincheck, racesController.edit);
 
-function isAdmin(req, res, next)
+function isAdmincheck(req, res, next)
 {
-    res.locals.isAdmin = true;
-    //get auth header val
-    const bearerHeader = req.headers['authorization'];
-    if(typeof bearerHeader !== 'undefined'){
-        req.token = bearerHeader.replace("Bearer ","");
-        var decoded = jwt.verify(req.token, 'geheim');
-        if(decoded != null && decoded){
-            console.log(decoded.isAdmin);
-            app.locals.isAdmin = decoded.isAdmin;
-            next();
-        }
-    }
+    if(req.verifiedUser.user.isAdmin == true){
         next();
-}
-function verifyToken(req, res, next)
-{
-    //get auth header val
-    const bearerHeader = req.headers['authorization'];
-    if(typeof bearerHeader !== 'undefined'){
-        req.token = bearerHeader.replace("Bearer ","");
-        var decoded = jwt.verify(req.token, 'geheim');
-        if(decoded != null && decoded){
-            next();
-        }
-        else{
-            res.sendStatus(403);
-        }
-    }else{
-        res.sendStatus(403);
+        return;
+    }
+    else{
+        res.render('error')
+        return false;
     }
 }
 function  needshtml(req, res, next) {
+    console.log('nu hier');
     if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
         next('route')
     }
     else{next();}
 }
-    function  needjson(req, res, next) {
-        if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
-            next();
-        } else {
-            next('route');
-        }
+function  needjson(req, res, next) {
+    console.log('ik ben heir');
+    if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
+        next();
+    } else {
+        next('route');
     }
+}
 module.exports = router;

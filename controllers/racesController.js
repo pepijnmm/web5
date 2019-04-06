@@ -102,7 +102,7 @@ exports.post = function(req, res, next) {
       }
     });
   }
-  exports.accept = function(req, res, next)
+  exports.enable = function(req, res, next)
   {
     Race.findByIdAndUpdate(req.params._id, {isStarted: true}, {new: true}, (err, race) =>
     {
@@ -120,19 +120,17 @@ exports.post = function(req, res, next) {
   }
 //id = id van een plaats
 exports.getlocation = function(req, res, next) {
-  const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];",
-      endcafes = "out;";
+  const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];";
   if (!(req.body.id && req.body.id != "")) {
     return;
   }
   query = "";
-  req.body.each((data) => {
-    query+="node(id:"+data+");";
+  req.body.id.each((data) => {
+    query+="node(id:"+data+");out;";
   })
-  unirest.get(stcafes + query + endcafes)
+  unirest.get(stcafes + query)
       .end(function (result) {
         if (result.body.elements != null && result.body.elements.length > 0) {
-          console.log(result.body.elements);
           return res.json(result.body.elements[0]);
         } else {
           return res.json(null);

@@ -11,7 +11,7 @@
                     <thead>
                     <tr>
                         <th>naam</th>
-                        <th>Aan</th>
+                        {{#if isAdmin}}<th>Aan</th>{{/if}}
                         <th>opties</th>
                     </tr>
                     </thead>
@@ -20,13 +20,13 @@
                         {{#if this.isStarted}}
                         <tr>
                             <td>{{this._id}}</td>
-                            <td>
+                        {{#if isAdmin}}<td>
                                 {{#if this.isStarted}}
                                         ja
                                 {{else}}
                                         nee
                                 {{/if}}
-                            </td>
+                        </td>{{/if}}
                             <td>
                                     <form action="/races/{{this._id}}">
 

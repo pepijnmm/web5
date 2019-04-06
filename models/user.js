@@ -24,7 +24,7 @@ var userSchema = mongoose.Schema({
         type: Boolean,
         required: true
     },
-    waypoints: [{type: String, ref: 'Waypoint'}],
+    waypoints: [{type: String}],
 });
 
 // userSchema.path('email').validate(function (email) {
