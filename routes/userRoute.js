@@ -54,7 +54,6 @@ module.exports = function(app, passport) {
          
         }
         else{
-          
           res.redirect('/login');
       
         }
@@ -249,9 +248,9 @@ module.exports = function(app, passport) {
     });
 
     app.get('/connect/facebook', passport.authenticate('facebook', { scope : ['public_profile', 'email'] }));
-    
+
       function isVerified(req, res, next) {
-        const bearerToken = req.cookies['token']; 
+        const bearerToken = req.cookies['token'];
         var user = null;
 
         if(typeof bearerToken !== 'undefined'){
@@ -260,11 +259,12 @@ module.exports = function(app, passport) {
                 {}
                 else{
                   user = data;
+                  req.verifiedUser = user;
                 }
             });
         }
-        req.verifiedUser = user;
-        
+
+
         next();
     }
 
