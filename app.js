@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 var jwt = require('jsonwebtoken');
 var session = require('express-session');
 var passport = require('passport');
+var exphbs  = require('express-handlebars');
 
 const swaggerJSDoc = require('swagger-jsdoc');
 var swaggerRouter = require('./routes/api-docs');
@@ -42,15 +43,67 @@ require('./config/passport')(passport);
 
 var app = express();
 
+// var hbs = exphbs.create({
+//     extname: '.hbs',
+//     //layoutsDir: path.join(__dirname, '/views'),
+//     //defaultLayout: 'layout'
+// });
+//
+
+
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+//app.engine('hbs', exphbs({layoutsDir: path.join(__dirname, '/views'),extname: '.hbs',defaultLayout: 'layout'}));
+//app.set('view engine', 'hbs');
+var hbs = exphbs.create({
+    layoutsDir: path.join(__dirname, '/views'),
+    defaultLayout: 'layout',
+    extname: '.hbs',
+    // Specify helpers which are only registered on this instance.
+    helpers: {
+        ifcond: function (v1, operator, v2, options) {
+
+            switch (operator) {
+                case '==':
+                    return (v1 == v2) ? options.fn(this) : options.inverse(this);
+                case '===':
+                    return (v1 === v2) ? options.fn(this) : options.inverse(this);
+                case '!=':
+                    return (v1 != v2) ? options.fn(this) : options.inverse(this);
+                case '!==':
+                    return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+                case '<':
+                    return (v1 < v2) ? options.fn(this) : options.inverse(this);
+                case '<=':
+                    return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+                case '>':
+                    return (v1 > v2) ? options.fn(this) : options.inverse(this);
+                case '>=':
+                    return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+                case '&&':
+                    return (v1 && v2) ? options.fn(this) : options.inverse(this);
+                case '||':
+                    return (v1 || v2) ? options.fn(this) : options.inverse(this);
+                default:
+                    return options.inverse(this);
+            }
+        }
+    }
+});
+
+app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
+
+//app.set('views', path.join(__dirname, '/views'));
+//app.engine('handlebars', exphbs());
+//app.set('view engine', 'handlebars');
+
+
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(session({
   secret: 'ilovescotchscotchyscotchscotch', // session secret

@@ -16,7 +16,6 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <p>{{isAdmin}}</p>
                     {{#each data}}
                         {{#if this.isStarted}}
                         <tr>
@@ -35,7 +34,27 @@
                                     </form>
                             </td>
                          </tr>
+                        {{else}}
+                            {{#if ../isAdmin}}
+                            <tr>
+                                <td>{{this._id}}</td>
+                                <td>
+                                    {{#if this.isStarted}}
+                                        ja
+                                    {{else}}
+                                        nee
+                                    {{/if}}
+                                </td>
+                                <td>
+                                    <form action="/races/{{this._id}}">
+
+                                        <input type="submit" value="Ga naar Race" />
+                                    </form>
+                                </td>
+                            </tr>
+                        {{/if}}
                     {{/if}}
+
                     {{/each}}
                     </tbody>
                 </table>

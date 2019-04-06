@@ -2,13 +2,10 @@ var mongoose = require('mongoose');
 
 let waypointSchema = mongoose.Schema({
     _id: {
-        type: String,
+        type: Number,
     },
-    name: {
-        type: String,
-    },
-    adress: {
-        type: String,
+    order: {
+        type: Number,
     }
 });
 

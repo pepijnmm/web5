@@ -1,17 +1,25 @@
 <div class="container">
     <section class="content-header">
         <h1>
-            Races
+            Waypoints van race: {{this._oldid}}
         </h1>
     </section>
     <section class="content">
         <div class="row">
-            <div class="box box-body">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>naam</th>
+                </tr>
+                </thead>
+                <tbody>
                 {{#each data}}
-                    <div class="waypointblock">
-                        <h2>waypoint naam: {{this._id}}</h2>
-                    </div>
+                    <tr>
+                        <td>{{this._id}}</td>
+                    </tr>
                 {{/each}}
+                </tbody>
+            </table>
                 <button onclick="location.href=window.location.href.split('?')[0]+'/create'" type="button">Waypoint toevoegen</button>
             </div>
         </div>

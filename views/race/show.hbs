@@ -22,12 +22,16 @@
                         <thead>
                         <tr>
                             <th>naam</th>
+                            <th>option</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{#each data.waypoints}}
                                 <tr>
-                                    <td>this</td>
+                                    <td>{{this}}</td>
+                                    <td><form action="/races/done/{{data._id}}" class="sendtoserver" method="POST">
+                                        <input type="submit" value="Geweest" />
+                                    </form></td>
                                 </tr>
                         {{/each}}
                         </tbody>

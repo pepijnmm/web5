@@ -7,7 +7,6 @@ exports.get = function(req, res, next) {
     }
 
     var result = Race.find(query);
-
     result.then(data => {
         if (req.params._id) {
             data = data[0];

@@ -19,12 +19,11 @@ var jwt = require('jsonwebtoken');
  *           type: array
  */
 router.all('*',isAdmin);
-router.get('/', needjson,verifyToken, racesController.get);
-router.get('/',needshtml, racesControllerhtml.get);
-router.get('/create',needshtml, racesControllerhtml.getCreate);
-router.get('/:_id',needshtml, racesControllerhtml.show);
 router.post('/location',needjson, racesController.getlocations);
-
+ router.get('/', needjson,verifyToken, racesController.get);
+ router.get('/',needshtml, racesControllerhtml.get);
+ router.get('/:_id/create',needshtml, racesControllerhtml.getCreate);
+ router.get('/:_id',needshtml, racesControllerhtml.show);
 router.get('/:_id', needjson, racesController.get);
 router.post('/', needjson, racesController.post);
 router.delete('/:_id',needjson, racesController.delete);
@@ -33,7 +32,7 @@ router.put('/enable/:_id',needjson, racesController.accept);
 
 function isAdmin(req, res, next)
 {
-    console.log('test');
+    res.locals.isAdmin = true;
     //get auth header val
     const bearerHeader = req.headers['authorization'];
     if(typeof bearerHeader !== 'undefined'){

@@ -32,10 +32,10 @@ if($(this).hasClass( "sendtoserver")) {
 });
 function getbars(e){
         var parbutton = $(e).parent();
-        var url = parbutton.attr('action');
-        var adress = parbutton.find("input[name='adress']").text();
-    var meters = parbutton.find("input[name='meters']").text();
-    var select
+        var url = $(e).attr('action');
+        var adress = parbutton.find("input[name='adress']")[0].value;
+        var meters = parbutton.find("input[name='meters']")[0].value;
+        var select = parbutton.find("select");
         $.ajax({
             type: "POST",
             url: url,
@@ -51,13 +51,17 @@ function getbars(e){
                 xhr.setRequestHeader("Authorization", 'Bearer '+ jwt);
                 xhr.setRequestHeader("Accept", "application/json");
             },
-            data: form.serialize(), // serializes the form's elements.
             success: function (data) {
                 if(data == 201 || data == 500 || data == 404){
                     alert("Er ging iets fout");
                 }
                 else{
-                    console.log(data);
+                    select.children().remove();
+                    data.forEach((elements)=>{
+                        if(elements.tags != undefined && elements.tags.name != undefined) {
+                            select.append('<option value="' + elements.id + '">' + elements.tags.name + '</option>');
+                        }
+                    })
                 }
             }
         });
