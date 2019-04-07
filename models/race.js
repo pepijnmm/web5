@@ -16,14 +16,28 @@ let raceSchema = mongoose.Schema({
 });
 
 raceSchema.query.byPage = function (pageIndex, pageSize) {
-    pageIndex = pageIndex || 0;
+    pageIndex = parseInt(pageIndex) || 0;
     pageSize = parseInt(pageSize) || 10;
     return this.find().skip(pageIndex * pageSize).limit(pageSize);
 };
 
 raceSchema.query.byStarted = function (started) {
-    if (started) {
+    if (started && (started == "false" || started == "true")) {
         return this.find({ isStarted: started });
+    } else {
+        return this.find();
+    }
+};
+
+raceSchema.query.hasWaypoint = function (waypoint) {
+    if (waypoint) {
+        return this.find({waypoints: waypoint}, (err, race) => {
+            if(err)
+            {
+                console.log(err);
+                return;
+            }
+    });
     } else {
         return this.find();
     }

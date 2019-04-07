@@ -39,7 +39,9 @@ exports.get = function(req, res, next) {
     }
 
     var result = Race.find(query)
-        .byPage(req.query.pageIndex, req.query.pageSize);
+        .byPage(req.query.pageIndex, req.query.pageSize)
+        .byStarted(req.query.byStarted)
+        .hasWaypoint(req.query.hasWaypoint);
 
     result.then(data => {
       if (req.params._id) {
