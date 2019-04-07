@@ -69,33 +69,12 @@ userSchema.path('local.email').validate(function (email) {
 
  }, 'Email is not in the right format')
 
-//  userSchema.path('local.password').validate(function (password) {
-//     console.log("password validatie");
-//     console.log(password);
-//     console.log("local pass::")
-//     console.log(this.password);
-
-//     if(password && password !== this.password)
-//     {
-//         var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-//         return true;//passwordRegex.test(password);
-//     }
-//     else{
-//         return true;
-//     }
-   
-//  }, 'Password must be 8 characters, atleast 1 number and 1 letter ')
-
  userSchema.pre('save', async function (next) {
      var user = this;
 
      if (!this.isNew) {
          return next();
      } else {
-         console.log(user.local.password);
-         console.log(user.local);
-         console.log(user)
-
          if (user.local.password) {
              var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
              if (!passwordRegex.test(user.local.password)) {
@@ -116,21 +95,17 @@ userSchema.path('local.email').validate(function (email) {
      }
  });
 
-
-
 userSchema.methods.validPassword = async function (password, hash) {
     await bcrypt.compare(password, hash, function (err, res) {
         return res;
     });
 };
 
-userSchema.methods.hashPassword = async function (password) {
-    await bcrypt.genSalt(saltRounds, async function (err, salt) {
-        await bcrypt.hash(password, salt, function (err, hash) {
-            return hash;
-        });
-    });
-    //return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+userSchema.methods.hashPassword = function (password) {
+
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(password, salt);
+    return hash;
 }
 
 let User = mongoose.model('User', userSchema);

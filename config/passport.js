@@ -113,8 +113,9 @@ module.exports = function(passport) {
 
                         if(user)
                         {
-                        
                             var hash = user.hashPassword(password);
+                            console.log("hash");
+                            console.log(hash);
                             user.local.email = email;
                             user.local.password = hash;
                             user.save(function (err) {

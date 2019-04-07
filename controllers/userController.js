@@ -30,11 +30,6 @@ require('../config/passport')(passport);
           res.redirect('/profile');
         })(req, res, next);
       }
-
-    exports.authGoogle = function(req, res, next)
-    {
-        passport.authenticate('google', { scope : ['profile', 'email'] })
-    }
     
     exports.facebookCallback = function(req, res, next) {
         passport.authenticate('facebook', function(err, user, info) {
