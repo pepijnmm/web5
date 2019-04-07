@@ -10,8 +10,8 @@ exports.get = function(req, res, next) {
 
 	if(req.params._id){
 		query._id = req.params._id;
-  } 
-  
+  }
+
   var result = Waypoint.find(query)
   .byPage(req.query.pageIndex, req.query.pageSize);
 
@@ -90,24 +90,39 @@ function getLocation(number) {
   });
 }
 exports.post = function(req, res, next) {
-  var waypoint = new Waypoint(req.body);
-  waypoint.save(function(err)
-  {
-   //duplicate key
-  if ( err && err.code === 11000 ) {
-    res.json(201, 'error', 'Waypoint already exists');
-    return;  
-  }
-  
+  Race.findById(req.params._id, (err, race) => {
   if(err)
     {
-        console.log(err);
-      res.status(err.status || 500);
-      res.render('error');
+      console.log(err);
+      res.status(500);
+      res.send();
     }
-    else{
-      return res.json(waypoint);
-    }});
+  else if(race != null) {
+    if(race.waypoints.indexOf(req.body._id)<0){
+      race.waypoints.push(req.body._id);
+
+      var waypoint = new Waypoint(req.body);
+      waypoint.save(function(err)
+      {
+        //duplicate key
+        if ( err && err.code === 11000 ) {
+          res.json(201, 'error', 'Waypoint already exists');
+          return;
+        }
+
+        if(err)
+        {
+          console.log(err);
+          res.status(err.status || 500);
+          res.render('error');
+        }
+        else{
+          race.save();
+          return res.json(waypoint);
+        }});
+    }
+  }
+  });
   }
 
   exports.delete = function(req, res, next)

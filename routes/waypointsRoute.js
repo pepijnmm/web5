@@ -7,11 +7,11 @@ var waypoints = require('../models/waypoint');
 router.get('/:_oldid/waypoints',isAdmincheck, needshtml, waypointsControllerhtml.getRace);
 router.get('/:_oldid/waypoints/create',isAdmincheck,needshtml, waypointsControllerhtml.getCreate);
 router.post('/:_oldid/waypoints/create',isAdmincheck, waypointsController.posts);
-router.post('/:_oldid/waypoints/check/:_id', waypointsController.check);
-router.get('/', waypointsController.get);
-router.get('/:_id', waypointsController.get);
-router.post('/',isAdmincheck, waypointsController.post);
-router.delete('/:_id',isAdmincheck, waypointsController.delete);
+router.post('/:_oldid/waypoints/check/:_id',needjson, waypointsController.check);
+router.get('/',needjson, waypointsController.get);
+router.get('/:_id/waypoints',needjson, waypointsController.get);
+router.post('/:_id/waypoints',needjson,isAdmincheck, waypointsController.post);
+router.delete('/:_id/waypoints',needjson,isAdmincheck, waypointsController.delete);
 
 router.post('/', waypointsController.post);
 
