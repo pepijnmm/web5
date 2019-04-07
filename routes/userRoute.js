@@ -7,7 +7,32 @@ var passport = require('passport');
 require('../config/passport')(passport);
 var userController = require('../controllers/userController');
 
+    
     router.get('/login', userController.isVerified, userController.getLogin);
+    /**
+ * @swagger
+ *
+ * /group:
+ * login:
+ *   post:
+ *     description: Gain token to access API
+ *     produces:
+ *       - JWT
+ *     parameters:
+ *       - name: email
+ *         description: email to use for login.
+ *         in: x-www-form-urlencoded
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: User's password.
+ *         in: x-www-form-urlencoded
+ *         required: true
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: login
+ */
     router.post('/login', needjson, userController.loginJson);
     router.post('/login', needshtml, userController.loginHtml);
     router.get('/logout', userController.isVerified, userController.getLogout);
