@@ -116,7 +116,7 @@ userSchema.methods.validPassword = function (password, hash) {
     return bcrypt.compareSync(password, hash);
 };
 
-userSchema.methods.hashPassword = async function (password) {
+userSchema.methods.hashPassword = function (password) {
     var salt = bcrypt.genSaltSync(saltRounds);
     return bcrypt.hashSync(password, salt);
 }

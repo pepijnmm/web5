@@ -26,4 +26,5 @@ var userController = require('../controllers/userController');
     router.get('/auth/facebook', passport.authenticate('facebook', { scope : ['public_profile', 'email'] }));
     router.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
     router.get('/auth/google/callback', userController.googleCallback);
+    router.get('/auth/facebook/callback', userController.facebookCallback);
     module.exports = router;
