@@ -22,6 +22,7 @@ router.post('/location',needjson, racesController.getlocations);
 router.put('/enable/:_id',needjson,isAdmincheck, racesController.enable);
  router.get('/', needjson, racesController.get);
  router.get('/',needshtml, racesControllerhtml.get);
+router.get('/:_id/edit',needshtml, isAdmincheck, racesControllerhtml.edit);
  router.get('/create',needshtml, isAdmincheck, racesControllerhtml.getCreate);
  router.get('/:_id',needshtml, racesControllerhtml.show);
 router.get('/:_id', needjson, racesController.get);

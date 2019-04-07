@@ -36,6 +36,19 @@ body {
 .nexttoeachoter > div > div{
     float:left;
 }
+.header h2{
+  float:left;
+}
+.header .btn-info{
+  float:right;
+}
+.header .removerace{
+  float:right;
+}
+.header{
+  display: table;
+  width: 100%;
+}
 /* Layout */
 .wrapper {
   height: 100%;

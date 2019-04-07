@@ -118,19 +118,13 @@ userSchema.path('local.email').validate(function (email) {
 
 
 
-userSchema.methods.validPassword = async function (password, hash) {
-    await bcrypt.compare(password, hash, function (err, res) {
-        return res;
-    });
+userSchema.methods.validPassword = function (password, hash) {
+    return bcrypt.compareSync(password, hash);
 };
 
 userSchema.methods.hashPassword = async function (password) {
-    await bcrypt.genSalt(saltRounds, async function (err, salt) {
-        await bcrypt.hash(password, salt, function (err, hash) {
-            return hash;
-        });
-    });
-    //return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+    var salt = bcrypt.genSaltSync(saltRounds);
+    return bcrypt.hashSync(password, salt);
 }
 
 let User = mongoose.model('User', userSchema);

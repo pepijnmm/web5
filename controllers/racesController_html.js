@@ -21,6 +21,20 @@ exports.get = function(req, res, next) {
     });
 
 }
+exports.edit = function(req, res, next) {
+    if (req.params._id) {
+        Race.findById(req.params._id, (err, race) => {
+            if(race != null) {
+                return res.render('race/edit', {data: req.params._id})
+            }
+            else{
+                res.status(500);
+                res.render('error');
+            }
+        });
+    }
+
+}
 exports.getCreate = function(req, res, next) {
     return res.render('race/create')
 }
@@ -28,25 +42,30 @@ exports.show = function(req, res, next) {
     if(req.params._id != undefined) {
         todo = [];
         Race.findById(req.params._id).then(data => {
-            if(data.isStarted || req.verifiedUser.user.isAdmin) {
+            if(data != null && ( data.isStarted || req.verifiedUser.user.isAdmin)) {
                 data.waypoints.forEach(waypoint => {
                     todo.push(waypoint);
                 });
                 getLocation(todo).then((waypoints) => {
                     var user = req.verifiedUser.user;
                     User.findById(user._id).then(user_data => {
-                        waypoints.forEach((point) => {
-                            if (user_data.waypoints.includes(req.params._id + '.' + point.id)) {
-                                point.done = true;
-                            }
-                        });
-                        nieuwdata = {old: data, waypoints: waypoints};
-                        return res.render('race/show', {data: nieuwdata})
+                        if(user_data != null) {
+                            waypoints.forEach((point) => {
+                                if (user_data.waypoints.includes(req.params._id + '.' + point.id)) {
+                                    point.done = true;
+                                }
+                            });
+                            nieuwdata = {old: data, waypoints: waypoints};
+                            return res.render('race/show', {data: nieuwdata})
+                        }
+                        else{
+                            res.redirect('/logout');
+                        }
                     });
                 });
             }
             else{
-                res.status(err.status || 500);
+                res.status(500);
                 res.render('error');
             }
         }).catch(err => {

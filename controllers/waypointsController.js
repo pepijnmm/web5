@@ -73,8 +73,6 @@ exports.posts = function(req, res, next) {
     result.then(data => {
       var i = data.waypoints.length;
       req.body.bars.forEach((data2)=>{
-        console.log(i);
-        console.log(data2);
         data.waypoints.push(data2);
         data.save();
         var waypoint = new Waypoint({_id: data2, order: ++i});

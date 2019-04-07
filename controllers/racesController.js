@@ -5,40 +5,22 @@ var unirest = require('unirest');
 var jwt = require('jsonwebtoken');
 var User = require('../models/user');
 
-// exports.get = function(req, res, next) {
-//   jwt.verify(req.token, 'geheim', (err, data) => {
-//     if(err)
-//     {
-//       res.sendStatus(403);
-//     }else{
-//
-//     }
-//   })
-//
-//   var query = {};
-//
-// 	if(req.params._id){
-// 		query._id = req.params._id;
-//   }
-//
-//   var result = Race.find(query)
-//   .byPage(req.query.pageIndex, req.query.pageSize);
-// }
-
 exports.getAmountofUsers = function(race) {
   return new Promise(async (resolve, reject) => {
     users = [];
     await Race.findById(race,async (err, data) => {
-      await asyncForEach(data.waypoints, async (waypoint)=>{
-        await User.find({waypoints: race+'.'+waypoint}, async (err, usersfind) => {
-          await asyncForEach(usersfind, async (user)=> {
-            if (!users.includes(String(user._id))) users.push(String(user._id));
+      if(race) {
+        await asyncForEach(data.waypoints, async (waypoint) => {
+          await User.find({waypoints: race + '.' + waypoint}, async (err, usersfind) => {
+            await asyncForEach(usersfind, async (user) => {
+              if (!users.includes(String(user._id))) users.push(String(user._id));
+            });
+            if (waypoint == data.waypoints[data.waypoints.length - 1]) {
+              resolve(users.length);
+            }
           });
-          if (waypoint == data.waypoints[data.waypoints.length - 1]) {
-            resolve(users.length);
-          }
         });
-      });
+      }
     });
   });
 }
@@ -102,14 +84,29 @@ exports.post = function(req, res, next) {
           res.render('error');
         }
         else{
-          res.status(200);
-          res.send();
+          console.log('verwijderd');
+          User.find({waypoints: new RegExp('^'+req.params._id+'\..*')}, (err, usersfind) => {
+            console.log('een gevonden?',usersfind);
+            usersfind.forEach((user) => {
+              console.log(user);
+              index = [];
+              const matches = user.waypoints.filter(s => s.includes(req.params._id+'.'));
+              matches.forEach((match)=>{
+                i = user.waypoints.indexOf(match);
+                user.waypoints.splice(i,1);
+              });
+              user.save();
+            });
+            res.status(200);
+            res.send();
+          });
+
         }
       })
   }
   exports.edit = function(req, res, next)
   {
-    Race.findByIdAndUpdate(req.params._id, req.body, {new: true}, (err, race) =>
+    Race.findById(req.params._id, (err, race) =>
     {
       if(err)
       {
@@ -117,9 +114,52 @@ exports.post = function(req, res, next) {
         res.status(500);
         res.send();
       }
-      else
+      else if(race != null)
       {
-        return res.json(race);
+
+        var newrace = new Race({_id:req.body._id, isStarted: race.isStarted, waypoints:race.waypoints});
+        newrace.save(function(err)
+        {
+          //duplicate key
+          if ( err && err.code === 11000 ) {
+            res.json(201, 'error', 'Race already exists');
+            return;
+          }
+
+          if(err)
+          {
+            console.log(err);
+            res.status(err.status || 500);
+            res.render('error');
+          }
+          else{
+            Race.findByIdAndDelete(req.params._id, function(err) {
+              if (err) {
+                res.status(err.status || 500);
+                res.render('error');
+              } else {
+                User.find({waypoints: new RegExp('^'+req.params._id+'\..*')}, (err, usersfind) => {
+                  usersfind.forEach((user) => {
+                    console.log(user);
+                    index = [];
+                      const matches = user.waypoints.filter(s => s.includes(req.params._id+'.'));
+                      matches.forEach((match)=>{
+                        i = user.waypoints.indexOf(match);
+                        waypoint = newrace._id + '.' + user.waypoints[i].split('.')[1];
+                        user.waypoints.splice(i,1);
+                        user.waypoints.push(waypoint);
+                      });
+                    user.save();
+                  });
+                  return res.json(race);
+                });
+              }
+            });
+          }});
+      }
+      else{
+        res.status(500);
+        res.render('error');
       }
     });
   }
