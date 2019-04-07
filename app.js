@@ -116,7 +116,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(session({
-  secret: 'ilovescotchscotchyscotchscotch', // session secret
+  secret: 'dfghjkoiuytrdjkjv', // session secret
   resave: true,
   saveUninitialized: true
 }));
@@ -152,6 +152,11 @@ function isVerified(req, res, next) {
         req.verifiedUser = fullfill;
         next();
     }, (reject)=>{
+        if(req.headers["accept"] != undefined && req.headers["accept"] == 'application/json')
+        {
+            res.send(401);
+            return false;
+        }
         res.redirect('/login');
         return false;
     });

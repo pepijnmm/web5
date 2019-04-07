@@ -69,35 +69,14 @@ userSchema.path('local.email').validate(function (email) {
 
  }, 'Email is not in the right format')
 
-//  userSchema.path('local.password').validate(function (password) {
-//     console.log("password validatie");
-//     console.log(password);
-//     console.log("local pass::")
-//     console.log(this.password);
-
-//     if(password && password !== this.password)
-//     {
-//         var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-//         return true;//passwordRegex.test(password);
-//     }
-//     else{
-//         return true;
-//     }
-   
-//  }, 'Password must be 8 characters, atleast 1 number and 1 letter ')
-
  userSchema.pre('save', async function (next) {
      var user = this;
 
      if (!this.isNew) {
          return next();
      } else {
-         console.log(user.local.password);
-         console.log(user.local);
-         console.log(user)
-
+         
          if (user.local.password) {
-             console.log("wat");
              var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
              if (!passwordRegex.test(user.local.password)) {
 

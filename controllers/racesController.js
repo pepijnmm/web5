@@ -39,7 +39,9 @@ exports.get = function(req, res, next) {
     }
 
     var result = Race.find(query)
-        .byPage(req.query.pageIndex, req.query.pageSize);
+        .byPage(req.query.pageIndex, req.query.pageSize)
+        .byStarted(req.query.byStarted)
+        .hasWaypoint(req.query.hasWaypoint);
 
     result.then(data => {
       if (req.params._id) {
@@ -141,7 +143,6 @@ exports.post = function(req, res, next) {
               } else {
                 User.find({waypoints: new RegExp('^'+req.params._id+'\..*')}, (err, usersfind) => {
                   usersfind.forEach((user) => {
-                    console.log(user);
                     index = [];
                       const matches = user.waypoints.filter(s => s.includes(req.params._id+'.'));
                       matches.forEach((match)=>{

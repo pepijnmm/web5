@@ -9,13 +9,6 @@ let waypointSchema = mongoose.Schema({
     }
 });
 
-waypointSchema.query.byPage = function (pageIndex, pageSize) {
-    pageIndex = pageIndex || 0;
-    pageSize = parseInt(pageSize) || 10;
-    return this.find().skip(pageIndex * pageSize).limit(pageSize);
-};
-
-
 let Waypoint = mongoose.model('Waypoint', waypointSchema);
 
 module.exports = Waypoint;
