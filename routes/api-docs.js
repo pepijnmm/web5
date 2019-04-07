@@ -11,7 +11,7 @@ const options = {
       },
     },
     // Path to the API docs
-    apis: ['./routes.js', 'routes/userRoute.js', 'routes/racesRoute.js'],
+    apis: ['./routes.js', 'routes/userRoute.js', 'routes/racesRoute.js', 'routes/waypointsRoute.js'],
   };
   
   // Initialize swagger-jsdoc -> returns validated swagger spec in json format

@@ -143,7 +143,6 @@ exports.post = function(req, res, next) {
               } else {
                 User.find({waypoints: new RegExp('^'+req.params._id+'\..*')}, (err, usersfind) => {
                   usersfind.forEach((user) => {
-                    console.log(user);
                     index = [];
                       const matches = user.waypoints.filter(s => s.includes(req.params._id+'.'));
                       matches.forEach((match)=>{

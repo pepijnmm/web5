@@ -12,8 +12,7 @@ var userController = require('../controllers/userController');
     /**
  * @swagger
  *
- * /group:
- * login:
+ * /login:
  *   post:
  *     description: Gain token to access API
  *     produces:
