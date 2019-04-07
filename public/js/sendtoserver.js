@@ -20,6 +20,18 @@ if($(this).hasClass( "createrace")) {
         }
     })
 }
+    if($(this).hasClass( "removerace")) {
+        e.preventDefault(); // ignore button
+        if (confirm('Weet je zekker dat je hem wilt verwijderen?')) {
+            var form = $(this);
+            var url = form.attr('action');
+            var type = form.attr('method');
+            type = (type != null || type != undefined) ? type : "POST";
+            sendstuff(url, type, form.serialize(), (data) =>{
+                window.location.href = window.location.href.replace(window.location.href.split('/').pop(), '');
+            })
+        }
+    }
 });
 
 function sendstuff(url, type, data, returnfunction=null){
@@ -33,8 +45,10 @@ function sendstuff(url, type, data, returnfunction=null){
             xhr.setRequestHeader("Accept", "application/json");
         },
         data: data,
-        success: function (data) {
-            if(data == 201 || data == 500 || data == 404){
+        success: function (data, textStatus, xhr) {
+            console.log(data);
+            console.log(xhr.status);
+            if(data == 201 || data == 500 || data == 404 || xhr.status == 404 || xhr.status == 500 || xhr.status == 201){
                 if(returnfunction!= null){
                     returnfunction({nodata:false});
                 }

@@ -10,7 +10,15 @@
         <div class="row">
             <div class="box box-body">
                 <div class="raceblock">
-                    <h2>Race naam: {{data.old._id}}</h2>
+                    <div class="header">
+                        <h2>Race naam: {{data.old._id}}</h2>
+                        {{#if isAdmin}}
+                            <a class="btn btn-info float-right" role="button" href="/races/{{data.old._id}}/edit">Aanpassen</a>
+                            <form action="/races/{{data.old._id}}" class="removerace" method="DELETE">
+                                <input class="btn-info" type="submit" value="Verwijderen" />
+                            </form>
+                        {{/if}}
+                    </div>
                     {{#if isAdmin}}
                         <p>Begonnen:
                         {{#if data.old.isStarted}}
@@ -22,7 +30,7 @@
                             </form>
                         {{/if}}
                         </p>
-                        <a class="btn btn-info" role="button" href="/races/{{data.old._id}}/waypoints">Nieuwe waypoint toevoegen</a>
+                        <a class="btn btn-info" role="button" href="/races/{{data.old._id}}/waypoints">waypoint lijst/toevoegen</a>
                     {{/if}}
                     <p>waypoints:</p>
                     <table class="table table-bordered">

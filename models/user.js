@@ -104,33 +104,21 @@ userSchema.path('local.email').validate(function (email) {
                  return;
              }
          }
-         await bcrypt.genSalt(saltRounds, async function (err, salt) {
-             if (err) return next(err);
-             await bcrypt.hash(user.local.password, salt, function (err, hash) {
-                 if (err) return next(err);
-
-                 user.local.password = hash;
-                 next();
-             });
-         });
+         var salt = bcrypt.genSaltSync(saltRounds);
+         user.local.password = bcrypt.hashSync(user.local.password, salt);
+         next();
      }
  });
 
 
 
-userSchema.methods.validPassword = async function (password, hash) {
-    await bcrypt.compare(password, hash, function (err, res) {
-        return res;
-    });
+userSchema.methods.validPassword = function (password, hash) {
+    return bcrypt.compareSync(password, hash);
 };
 
 userSchema.methods.hashPassword = async function (password) {
-    await bcrypt.genSalt(saltRounds, async function (err, salt) {
-        await bcrypt.hash(password, salt, function (err, hash) {
-            return hash;
-        });
-    });
-    //return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+    var salt = bcrypt.genSaltSync(saltRounds);
+    return bcrypt.hashSync(password, salt);
 }
 
 let User = mongoose.model('User', userSchema);
