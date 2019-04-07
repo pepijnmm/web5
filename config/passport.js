@@ -25,7 +25,7 @@ module.exports = function(passport) {
                 {
                    return done(null, false, "No user found");
                 }
-                if(!user.validPassword(password))
+                if(!user.validPassword(password,user.local.password))
                 {
                     return done(null, false, "Wrong password");
                 }

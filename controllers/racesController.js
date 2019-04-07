@@ -3,6 +3,7 @@ var Race = require('../models/race');
 var express = require('express');
 var unirest = require('unirest');
 var jwt = require('jsonwebtoken');
+var User = require('../models/user');
 
 // exports.get = function(req, res, next) {
 //   jwt.verify(req.token, 'geheim', (err, data) => {
@@ -24,8 +25,28 @@ var jwt = require('jsonwebtoken');
 //   .byPage(req.query.pageIndex, req.query.pageSize);
 // }
 
-
-
+exports.getAmountofUsers = function(race) {
+  return new Promise(async (resolve, reject) => {
+    users = [];
+    await Race.findById(race,async (err, data) => {
+      await asyncForEach(data.waypoints, async (waypoint)=>{
+        await User.find({waypoints: race+'.'+waypoint}, async (err, usersfind) => {
+          await asyncForEach(usersfind, async (user)=> {
+            if (!users.includes(String(user._id))) users.push(String(user._id));
+          });
+          if (waypoint == data.waypoints[data.waypoints.length - 1]) {
+            resolve(users.length);
+          }
+        });
+      });
+    });
+  });
+}
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
 
 exports.get = function(req, res, next) {
     var query = {};

@@ -3,6 +3,7 @@ var Waypoint = require('../models/waypoint');
 var Race = require('../models/race');
 var express = require('express');
 var User = require('../models/user');
+var unirest = require('unirest');
 
 exports.get = function(req, res, next) {
   var query = {};
@@ -90,7 +91,14 @@ exports.check = function(req, res, next) {
   user = User.findById(user._id);
   user.then(user_data => {
     if(!user_data.waypoints.includes(req.params._oldid + '.' + req.params._id)) {
-      res.io.emit(req.params._oldid+"_waypoint."+req.params._id, user_data.id);
+      res.io.emit("socketToMe", "users");
+      getLocation([req.params._id]).then((waypoints)=>{
+        waypoints.forEach((point)=> {
+          res.io.to('user').emit(req.params._oldid + "_waypoint", 'iemand is langs '+point.tags.name+' gekomen');
+          res.io.to('admin').emit(req.params._oldid + "_waypoint", 'iemand met het id: '+user_data.id + ' is langs '+point.tags.name+' gekomen');
+        });
+
+      });
       user_data.waypoints.push(req.params._oldid + '.' + req.params._id);
       user_data.save();
       return res.json(true);
@@ -98,6 +106,24 @@ exports.check = function(req, res, next) {
     else{
       return res.status(500);
     }
+  });
+}
+function getLocation(number) {
+  const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];";
+  query = "";
+  number.forEach((data) => {
+    query+="node(id:"+data+");out;";
+  })
+  return new Promise((resolve, reject) => {
+    unirest.get(stcafes + query)
+        .end(function (result) {
+          if (result.body.elements != null && result.body.elements.length > 0) {
+            resolve(result.body.elements);
+          } else {
+            resolve([]);
+          }
+
+        });
   });
 }
 exports.post = function(req, res, next) {

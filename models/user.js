@@ -1,7 +1,7 @@
 
 var mongoose = require('mongoose');
-var bcrypt = require('bcrypt-nodejs');
-var SALT_WORK_FACTOR = 10;
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 var userSchema = mongoose.Schema({
     local: {
@@ -86,50 +86,51 @@ userSchema.path('local.email').validate(function (email) {
    
 //  }, 'Password must be 8 characters, atleast 1 number and 1 letter ')
 
- userSchema.pre('save', function(next) {
-    var user = this;
+ userSchema.pre('save', async function (next) {
+     var user = this;
 
-    if (!this.isNew)
-    {
-        return next();
-    }
-    else{
-        console.log(user.local.password);
-        console.log(user.local);
-        console.log(user)
+     if (!this.isNew) {
+         return next();
+     } else {
+         console.log(user.local.password);
+         console.log(user.local);
+         console.log(user)
 
-        if(user.local.password)
-        {
-            var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-            if(!passwordRegex.test(user.local.password))
-            {
-                console.log("fout");
-                throw new Error('Password must be length of 8 and contain 1 letter and 1 number');
-                return;
-            }
-        }
-    } 
+         if (user.local.password) {
+             var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+             if (!passwordRegex.test(user.local.password)) {
 
-    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-        if (err) return next(err);
-        bcrypt.hash(user.local.password, salt, null, function(err, hash) {
-            if (err) return next(err);
+                 throw new Error('Password must be length of 8 and contain 1 letter and 1 number');
+                 return;
+             }
+         }
+         await bcrypt.genSalt(saltRounds, async function (err, salt) {
+             if (err) return next(err);
+             await bcrypt.hash(user.local.password, salt, function (err, hash) {
+                 if (err) return next(err);
 
-            user.local.password = hash;
-            next();
-        });
+                 user.local.password = hash;
+                 next();
+             });
+         });
+     }
+ });
+
+
+
+userSchema.methods.validPassword = async function (password, hash) {
+    await bcrypt.compare(password, hash, function (err, res) {
+        return res;
     });
-});
-
-
-
-userSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password); 
 };
 
-userSchema.methods.hashPassword = function(password)
-{
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+userSchema.methods.hashPassword = async function (password) {
+    await bcrypt.genSalt(saltRounds, async function (err, salt) {
+        await bcrypt.hash(password, salt, function (err, hash) {
+            return hash;
+        });
+    });
+    //return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
 }
 
 let User = mongoose.model('User', userSchema);

@@ -42,14 +42,14 @@ let race_seed = [
 let user_seed = [
     {
         local: {
-        email: "test123",
-        password: "test123"
+        email: "test123@gmail.com",
+        password: "$2b$10$Kwcf7Jk0J/52tqaRMgObseLdsqSKFPBaZQ2YbRHC2oGlJC.YI./Wa" //test123
         }
     },
     {
         local: {
-            email: "admin",
-            password: "admin"
+            email: "admin@gmail.com",
+            password: "$2b$10$Kwcf7Jk0J/52tqaRMgObseLdsqSKFPBaZQ2YbRHC2oGlJC.YI./Wa"//test123
         },
         isAdmin: true
     }
