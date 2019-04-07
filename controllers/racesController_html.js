@@ -28,22 +28,27 @@ exports.show = function(req, res, next) {
     if(req.params._id != undefined) {
         todo = [];
         Race.findById(req.params._id).then(data => {
-            data.waypoints.forEach(waypoint => {
-                todo.push(waypoint);
-            });
-            getLocation(todo).then((waypoints) => {
-                var user = req.verifiedUser.user;
-                User.findById(user._id).then(user_data => {
-                    waypoints.forEach((point)=>{
-                        if(user_data.waypoints.includes(req.params._id+'.'+point.id)){
-                            point.done = true;
-                        }
-                    });
-                    nieuwdata = {old: data, waypoints: waypoints};
-                    return res.render('race/show', {data: nieuwdata})
+            if(data.isStarted || req.verifiedUser.user.isAdmin) {
+                data.waypoints.forEach(waypoint => {
+                    todo.push(waypoint);
                 });
-            });
-
+                getLocation(todo).then((waypoints) => {
+                    var user = req.verifiedUser.user;
+                    User.findById(user._id).then(user_data => {
+                        waypoints.forEach((point) => {
+                            if (user_data.waypoints.includes(req.params._id + '.' + point.id)) {
+                                point.done = true;
+                            }
+                        });
+                        nieuwdata = {old: data, waypoints: waypoints};
+                        return res.render('race/show', {data: nieuwdata})
+                    });
+                });
+            }
+            else{
+                res.status(err.status || 500);
+                res.render('error');
+            }
         }).catch(err => {
             console.log(err);
             res.status(err.status || 500);

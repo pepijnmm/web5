@@ -26,6 +26,16 @@ body {
 .changemap{
   margin-left:20px;
 }
+#chat{
+  min-height:400px;
+  max-height:400px;
+  height:400px;
+  overflow: scroll;
+    width: 600px;
+}
+.nexttoeachoter > div > div{
+    float:left;
+}
 /* Layout */
 .wrapper {
   height: 100%;

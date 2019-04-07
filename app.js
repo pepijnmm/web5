@@ -11,6 +11,8 @@ var flash = require('connect-flash');
 var exphbs  = require('express-handlebars');
 var cookie = require('cookie');
 
+var racesController = require('./controllers/racesController');
+
 const swaggerJSDoc = require('swagger-jsdoc');
 var swaggerRouter = require('./routes/api-docs');
 var racesRouter = require('./routes/racesRoute');
@@ -119,19 +121,23 @@ app.use(session({
 }));
 
 io.sockets
-    .on('connection', function(socket,req){
+    .on('connection', function(socket){
     var cookies = cookie.parse(socket.handshake.headers.cookie);
-    console.log(app.locals.isAdmin);
-    console.log(req.verifiedUser );
-    if(checktoken(cookies.token)){
-        socket.on('joinroom',function(data,callback) {
-            socket.join('login');
-
+    checktoken(cookies.token).then((fullfill)=>{
+        if(app.locals.isAdmin){
+            socket.join('admin');
+        }
+        else {
+            socket.join('user');
+        }
+        socket.on('amount users', function(id){
+            racesController.getAmountofUsers(id).then((amount)=>{
+                socket.emit('amountUser', amount);
+            });
         });
-    }
-    else{
+    }, (reject)=>{
         socket.join('notlogedin');
-    }
+    });
 });
 
 
