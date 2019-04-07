@@ -5,22 +5,27 @@
         </h1>
     </section>
     <section class="content">
-        <div class="row">
+        <div class="row"><div class="header">
+
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>naam</th>
+                    {{#if isAdmin}}<th>options</th>{{/if}}
                 </tr>
                 </thead>
                 <tbody>
                 {{#each data}}
                     <tr>
                         <td>{{this._id}}</td>
+                    {{#if ../isAdmin}}<td><form action="/races/{{../this._oldid}}/waypoint/{{this._id}}" class="removerace" method="DELETE">
+                            <input class="btn-info" type="submit" value="Verwijderen" />
+                    </form></td>{{/if}}
                     </tr>
                 {{/each}}
                 </tbody>
             </table>
-                <button onclick="location.href=window.location.href.split('?')[0]+'/create'" type="button">Waypoint toevoegen</button>
+{{#if isAdmin}}<button onclick="location.href=window.location.href.split('?')[0]+'/create'" type="button">Waypoint toevoegen</button>{{/if}}
             </div>
         </div>
     </section>

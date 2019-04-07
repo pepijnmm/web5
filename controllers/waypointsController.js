@@ -89,7 +89,7 @@ function getLocation(number) {
         });
   });
 }
-exports.getLocation = function(req, res, next) {
+exports.location = function(req, res, next) {
   if(req.params._id){
     getLocation([req.params._id]).then( (data)=>{
       if(data == null || data.length == 0){
@@ -140,10 +140,45 @@ exports.post = function(req, res, next) {
   }
   });
   }
-
+exports.fulldelete = function(req, res, next)
+{
+  Waypoint.findByIdAndDelete(req.params._id, function(err){
+    if(err)
+    {
+      console.log(err);
+      res.status(err.status || 500);
+      res.render('error');
+    }
+    else{
+      Race.find({waypoints: req.params._id}, (err, races) => {
+        if(races != null) {
+          races.forEach((race) => {
+            if (race.waypoints.indexOf(req.params._id) > -1) {
+              race.waypoints.splice(race.waypoints.indexOf(req.params._id), 1);
+              race.save();
+            }
+          });
+        }
+      });
+      User.find({waypoints: new RegExp('.*\.' + req.params._id + '$')}, (err, usersfind) => {
+        usersfind.forEach((user) => {
+          index = [];
+          const matches = user.waypoints.filter(s => s.includes('.' + req.params._id));
+          matches.forEach((match) => {
+            i = user.waypoints.indexOf(match);
+            user.waypoints.splice(i, 1);
+          });
+          user.save();
+        });
+        res.status(200);
+        res.send();
+      });
+    }
+  })
+}
   exports.delete = function(req, res, next)
   {
-      Waypoint.findByIdAndDelete(req.params._id, function(err){
+      Waypoint.findById(req.params._id, function(err){
         if(err)
         {
             console.log(err);
@@ -151,9 +186,28 @@ exports.post = function(req, res, next) {
           res.render('error');
         }
         else{
-          res.status(200);
-          res.send();
-        }
+          Race.findById(req.params._oldid, (err, race) => {
+            if(race != null) {
+                if (race.waypoints.indexOf(req.params._id) > -1) {
+                  race.waypoints.splice(race.waypoints.indexOf(req.params._id), 1);
+                  race.save();
+                }
+            }
+          });
+            User.find({waypoints: req.params._oldid+'.' + req.params._id}, (err, usersfind) => {
+              usersfind.forEach((user) => {
+                index = [];
+                const matches = user.waypoints.filter(s => s.includes(req.params._oldid+'.' + req.params._id));
+                matches.forEach((match) => {
+                  i = user.waypoints.indexOf(match);
+                  user.waypoints.splice(i, 1);
+                });
+                user.save();
+              });
+              res.status(200);
+              res.send();
+            });
+          }
       })
   }
 

@@ -147,7 +147,13 @@ app.use(passport.session());
 
 app.use('/', swaggerRouter);
 function isVerified(req, res, next) {
-    const bearerToken = req.cookies['token'];
+    var bearerToken = req.cookies['token'];
+    if(bearerToken == null){
+        if(req.headers['authorization'] != undefined && req.headers['authorization'] != null) {
+            bearerToken = req.headers['authorization'];
+            bearerToken = bearerToken.replace('Bearer ','');
+        }
+    }
     checktoken(bearerToken).then((fullfill)=>{
         req.verifiedUser = fullfill;
         next();
