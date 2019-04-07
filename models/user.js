@@ -97,15 +97,18 @@ userSchema.path('local.email').validate(function (email) {
          console.log(user)
 
          if (user.local.password) {
+             console.log("wat");
              var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
              if (!passwordRegex.test(user.local.password)) {
 
                  throw new Error('Password must be length of 8 and contain 1 letter and 1 number');
                  return;
              }
+
+             var salt = bcrypt.genSaltSync(saltRounds);
+             user.local.password = bcrypt.hashSync(user.local.password, salt);
          }
-         var salt = bcrypt.genSaltSync(saltRounds);
-         user.local.password = bcrypt.hashSync(user.local.password, salt);
+
          next();
      }
  });
