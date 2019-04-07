@@ -9,6 +9,7 @@ router.get('/:_oldid/waypoints/create',isAdmincheck,needshtml, waypointsControll
 router.post('/:_oldid/waypoints/create',isAdmincheck, waypointsController.posts);
 router.post('/:_oldid/waypoints/check/:_id',needjson, waypointsController.check);
 router.get('/',needjson, waypointsController.get);
+router.get('/:_id/waypoint',needjson, waypointsController.getLocation);
 router.get('/:_id/waypoints',needjson, waypointsController.get);
 router.post('/:_id/waypoints',needjson,isAdmincheck, waypointsController.post);
 router.delete('/:_id/waypoints',needjson,isAdmincheck, waypointsController.delete);

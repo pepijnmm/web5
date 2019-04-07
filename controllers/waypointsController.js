@@ -89,6 +89,22 @@ function getLocation(number) {
         });
   });
 }
+exports.getLocation = function(req, res, next) {
+  if(req.params._id){
+    getLocation([req.params._id]).then( (data)=>{
+      if(data == null || data.length == 0){
+        return res.status(500);
+      }
+      else{
+        return res.json(data);
+      }
+    })
+  }
+  else{
+    return res.status(500);
+  }
+}
+
 exports.post = function(req, res, next) {
   Race.findById(req.params._id, (err, race) => {
   if(err)
