@@ -45,7 +45,7 @@
 
                                 <tr>
                                     <td>{{#if this.tags.name}} {{this.tags.name}} {{/if}}</td>
-                                    <td>{{#unless ../isAdmin}}{{#if this.done}}Al gehad{{else}}<button onclick="adddone('{{../data.old._id}}','{{this.id}}')" >Aandoen</button>{{/if}}{{/unless}}<button onclick="setmap({{this.lat}},{{this.lon}})" class="changemap">Laat zien op de map</button></td>
+                                    <td>{{#unless ../isAdmin}}{{#if this.done}}Al gehad{{else}}<button onclick="adddone('{{../data.old._id}}','{{this.id}}')" >Ik ben hier geweest</button>{{/if}}{{/unless}}<button onclick="setmap({{this.lat}},{{this.lon}})" class="changemap">Laat zien op de map</button></td>
                                 </tr>
                         {{/each}}
                         </tbody>

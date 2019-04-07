@@ -28,41 +28,6 @@ exports.get = function(req, res, next) {
         res.render('error');
       });
   }
-exports.getRace = function(req, res, next) {
-  var query = {};
-
-  if(req.params._oldid) {
-    query._id = req.params._oldid;
-    var result = Race.find(query);
-    result.then(data => {
-      if (data[0].waypoints.length > 0) {
-        arr = [];
-        data[0].waypoints.forEach(element => {
-          arr.push(element)
-        });
-        var result = Waypoint.where('_id').in(arr)
-            .byPage(req.query.pageIndex, req.query.pageSize);
-
-        result.then(data => {
-          if (req.params._id) {
-            data = data[0];
-          }
-
-          return res.render('waypoint/index', {data: data, _oldid: req.params._oldid});
-        }).catch(err => {
-          console.log(err);
-          res.status(err.status || 500);
-          res.render('error');
-        });
-      } else {
-        res.render('error');
-      }
-    });
-  }
-  else{
-    res.render('error')
-  }
-}
 exports.posts = function(req, res, next) {
   if(req.body.bars != undefined && req.body.bars.length > 0 && req.params._oldid != undefined) {
     var i = 0;
