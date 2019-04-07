@@ -8,7 +8,8 @@ require('../config/passport')(passport);
 var userController = require('../controllers/userController');
 
     router.get('/login', userController.isVerified, userController.getLogin);
-    router.post('/login', userController.login);
+    router.post('/login', needjson, userController.loginJson);
+    router.post('/login', needshtml, userController.loginHtml);
     router.get('/logout', userController.isVerified, userController.getLogout);
     router.get('/profile', userController.isVerified, userController.getProfile);
     router.get('/signup', userController.getSignUp);
@@ -27,4 +28,19 @@ var userController = require('../controllers/userController');
     router.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
     router.get('/auth/google/callback', userController.googleCallback);
     router.get('/auth/facebook/callback', userController.facebookCallback);
+
+    function  needshtml(req, res, next) {
+        if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
+            next('route')
+        }
+        else{next();}
+    }
+    function  needjson(req, res, next) {
+        if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
+            next();
+        } else {
+            next('route');
+        }
+    }
+
     module.exports = router;

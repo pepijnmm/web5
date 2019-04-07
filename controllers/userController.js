@@ -5,7 +5,7 @@ var jwt = require('jsonwebtoken');
 var passport = require('passport');
 require('../config/passport')(passport);
 
-    exports.login = function(req, res, next) {
+    exports.loginHtml = function(req, res, next) {
         passport.authenticate('local-login', function(err, user, info) {
           if (err) { 
             return res.render('user/login', {layout:false, message: err.message});  
@@ -15,6 +15,22 @@ require('../config/passport')(passport);
           }
           res.cookie('token', user)
           res.redirect('/profile');
+        })(req, res, next);
+      }
+
+      exports.loginJson = function(req, res, next) {
+        passport.authenticate('local-login', function(err, user, info) {
+          if (err) { 
+            res.status(500);
+            return res.json(err); 
+           }
+          if (!user) {
+            res.status(400);
+            return res.json(info);   
+          }
+          res.cookie('token', user);
+          res.status(201);
+          return res.json(user);
         })(req, res, next);
       }
 
