@@ -86,8 +86,11 @@ module.exports = function(passport) {
 
                         nUser.save(function(err) {
                             if (err)
+                            {
+                            
                                 return done(err);
-
+                            }
+                                
                             return done(null, nUser, "Succesful");
                         });
                     }
@@ -110,8 +113,10 @@ module.exports = function(passport) {
 
                         if(user)
                         {
+                        
+                            var hash = user.hashPassword(password);
                             user.local.email = email;
-                            user.local.password = password;
+                            user.local.password = hash;
                             user.save(function (err) {
                                 if (err)
                                     return done(err);
@@ -331,7 +336,6 @@ module.exports = function(passport) {
 
                         if(user)
                         {
-        
                             User.findOne({ 'google.email' : (profile.emails[0].value || '').toLowerCase()}, function(err, email){
                                 if(err)
                                 {return done(err)}
