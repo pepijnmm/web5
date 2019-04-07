@@ -31,6 +31,7 @@ async function asyncForEach(array, callback) {
 }
 
 exports.get = function(req, res, next) {
+
     var query = {};
 
     if (req.params._id) {

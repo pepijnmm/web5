@@ -184,9 +184,9 @@ app.use('/', userRouter);
 app.use('/', isVerified);
 app.use('/races', racesRouter);
 app.use('/races', waypointsRouter);
-app.use('/',(req, res,next)=>{
+app.use('/*',(req, res,next)=>{
     res.redirect('/races');
-})
+});
 
 app.get('*', function(req, res){
     res.render('error',{message:"pagina niet gevonden", error:{status:404}});
