@@ -76,7 +76,8 @@
                     </a>
                     <ul class="treeview-menu">
                         <li><a href="/races"><i class="fa fa-table"></i> Index</a></li>
-                        <li><a href="/races/create"><i class="fa fa-plus-circle"></i> Toevoegen</a></li>
+                        {{#if isAdmin}}<li><a href="/races/create"><i class="fa fa-plus-circle"></i> Toevoegen</a></li>{{/if}}
+
                     </ul>
                 </li>
             </ul>

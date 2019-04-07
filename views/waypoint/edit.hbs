@@ -1,0 +1,28 @@
+<div class="container">
+    <section class="content-header">
+        <h1>
+            Waypoint Bewerken
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="box box-body">
+                <form id="formpage" class="sendtoserver" action="/races/{{race_id}}/waypoints/create" method="POST">
+                    <div class="form-group">
+                        <label>adress: </label>
+                        <input type="text" name="adress" required autofocus>
+                        <label>Meters: </label>
+                        <input type="text" name="meters" required autofocus>
+                        <input type="button" onclick="getbars(this)" action="/races/location" value="Zoek bars"></input>
+                        <label>bars(u moet hiervoor eerst zoeken): </label>
+                        <select multiple name="bars" required>
+                        </select>
+                    </div>
+                    <div class="box-footer">
+                        <input type="submit" onclick=" " type="button" value="Opslaan">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>

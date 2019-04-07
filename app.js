@@ -16,6 +16,7 @@ var racesController = require('./controllers/racesController');
 const swaggerJSDoc = require('swagger-jsdoc');
 var swaggerRouter = require('./routes/api-docs');
 var racesRouter = require('./routes/racesRoute');
+var userRouter = require('./routes/userRoute.js');
 var waypointsRouter = require('./routes/waypointsRoute');
 
 var app = express();
@@ -143,7 +144,7 @@ io.sockets
 
 app.use(passport.initialize());
 app.use(passport.session());
-require('./routes/userRoute.js')(app, passport);
+
 app.use('/', swaggerRouter);
 function isVerified(req, res, next) {
     const bearerToken = req.cookies['token'];
@@ -174,13 +175,11 @@ app.use(function(req, res, next){
     res.io = io;
     next();
 });
+app.use('/', userRouter);
 app.use('/', isVerified);
 app.use('/races', racesRouter);
 app.use('/races', waypointsRouter);
-//app.use('/', swaggerRouter);
 
-
-require('./routes/userRoute.js')(app, passport);
 app.get('*', function(req, res){
     res.render('error',{message:"pagina niet gevonden", error:{status:404}});
 });
