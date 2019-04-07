@@ -104,15 +104,9 @@ userSchema.path('local.email').validate(function (email) {
                  return;
              }
          }
-         await bcrypt.genSalt(saltRounds, async function (err, salt) {
-             if (err) return next(err);
-             await bcrypt.hash(user.local.password, salt, function (err, hash) {
-                 if (err) return next(err);
-
-                 user.local.password = hash;
-                 next();
-             });
-         });
+         var salt = bcrypt.genSaltSync(saltRounds);
+         user.local.password = bcrypt.hashSync(user.local.password, salt);
+         next();
      }
  });
 
