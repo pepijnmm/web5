@@ -52,9 +52,27 @@ router.post('/location',needjson, racesController.getlocations);
  *         type: number
  */
 router.post('/:_oldid/waypoints/check/:_id',needjson, waypointsController.check);
-router.get('/',needjson, waypointsController.get);
-router.get('/:_id/waypoints',needjson, waypointsController.get);
-router.post('/:_id/waypoints',needjson,isAdmincheck, waypointsController.post);
+
+   /**
+ * @swagger
+ *
+ * /races/_oldid/waypoints/check/id:
+ *   post:
+ *     description: Controleren of dat er mensen langs een locatie zijn gekomen
+ *     produces:
+ *       Json
+ *     parameters:
+ *       - name: _oldid
+ *         description: moet nog beschreven worden
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: id
+ *         description: moet nog beschreven worden
+ *         in: params
+ *         required: true
+ *         type: string
+ */
 router.delete('/:_id/waypoints',needjson,isAdmincheck, waypointsController.delete);
 
    /**
