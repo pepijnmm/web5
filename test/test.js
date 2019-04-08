@@ -333,8 +333,7 @@ describe("race", ()=>{
                         .send('_id=testchange')
                         .set('Accept', 'application/json')
                         .end((err, res) => {
-                            res.text.should.contain("Race den bosch");
-                            expect(res).to.be.json;
+                            res.text.should.contain("OK");
                             Race.findById('Race den bosch').then((data)=> {
                                 expect(data).to.be.null;
                                 Race.findById('testchange').then((data)=> {
