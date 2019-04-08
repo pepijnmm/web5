@@ -55,19 +55,19 @@ describe("usersettings", ()=>{
                     res.text.should.not.contain("No user found");
                     //console.log(res.req.res.headers['set-cookie']);
                     tokenadmin = res.text;
+                    user.post('/login')
+                    .send('email=test123@gmail.com')
+                    .send('password=test123')
+                    .set('Accept', 'application/json')
+                    .set('Content-Type', 'application/x-www-form-urlencoded')
+                    .end((err, res) => {
+                        res.should.have.status(201);
+                        res.text.should.not.contain("No user found");
+                        tokenuser = res.text;
+                        done();
+                    });
                 });
-            user.post('/login')
-                .send('email=test123@gmail.com')
-                .send('password=test123')
-                .set('Accept', 'application/json')
-                .set('Content-Type', 'application/x-www-form-urlencoded')
-                .end((err, res) => {
-                    res.should.have.status(201);
-                    res.text.should.not.contain("No user found");
-                    //console.log(res.req.res.headers['set-cookie']);
-                    tokenuser = res.text;
-                    done();
-                });
+
         });
         it("should not accept wrong email for user",(done)=> {
             chai.request(app).post('/login')
@@ -252,6 +252,7 @@ describe("race", ()=>{
                         res.text.should.contain( "Race den bosch");
                         expect(res).to.be.json;
                         res.text.should.not.contain( "Arnhem bierdag");
+                        JSON.parse(res.text).waypoints[0].tags.name.contain("De Saeck");
                         done();
                     });
             });
@@ -268,33 +269,114 @@ describe("race", ()=>{
     });
     describe("user can not do", ()=>{
         describe("enable", ()=> {
-            it("cannot send data to enable function");
+            it("cannot send data to enable function",(done)=> {
+                user.put('/races/enable/'+"Arnhem bierdag")
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        res.text.should.contain( "<h1></h1>");
+                        expect(res).to.be.html;
+                        done();
+                    });
+            });
         });
     });
     describe("admin can do", ()=>{
         describe("enable", ()=> {
-            it("can change disable to enable");
+            it("can change disable to enable", (done)=> {
+                admin.get('/races/' + "Arnhem bierdag")
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        res.text.should.contain("Arnhem bierdag");
+                        res.text.should.contain("\"isStarted\":false,");
+                        expect(res).to.be.json;
+                        admin.put('/races/enable/' + "Arnhem bierdag")
+                            .set('Accept', 'application/json')
+                            .end((err, res) => {
+                                res.text.should.contain("\"isStarted\":true,");
+                                res.text.should.contain("\"_id\":\"Arnhem bierdag\",");
+                                expect(res).to.be.json;
+                                done();
+                            });
+                    });
+            });
         });
         describe("Create", ()=> {
-            it("can create change race");
-            it("can not create race with same name");
+            it("can create race", (done)=> {
+                admin.post('/races')
+                    .send('_id=test')
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        res.text.should.contain("\"_id\":\"test\"");
+                        res.text.should.not.contain(201);
+                        expect(res).to.be.json;
+                        Race.findById('test').then((data)=>{
+                            if(data._id == 'test'){
+                                done();
+                            }
+                        });
+                    });
+            });
+            it("can not create race with same name", (done)=> {
+                admin.post('/races')
+                    .send('_id=test')
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        res.text.should.contain(201);
+                        expect(res).to.be.json;
+                        done();
+                    });
+            });
         });
         describe("edit", ()=> {
-            it("can change change race");
+            it("can change change race", (done)=> {
+                Race.findById('testchange').then((data)=>{
+                    expect(data).to.be.null;
+                    Race.findById('Race den bosch').then((data)=> {
+                        expect(data).to.not.be.null;
+                        admin.put('/races/Race den bosch')
+                        .send('_id=testchange')
+                        .set('Accept', 'application/json')
+                        .end((err, res) => {
+                            res.text.should.contain("Race den bosch");
+                            expect(res).to.be.json;
+                            Race.findById('Race den bosch').then((data)=> {
+                                expect(data).to.be.null;
+                                Race.findById('testchange').then((data)=> {
+                                    expect(data).to.not.be.null;
+                                    done();
+                                });
+                            });
+                        });
+                    });
+                });
+            });
             it("can not change function if no race is found");
         });
         describe("delete", ()=> {
-            it("can delete change race");
+            it("can delete race");
             it("can not do delete function if no race is found");
         });
     });
 });
 describe("waypoints", ()=>{
     describe("not signin can do", ()=> {
-        it("does not get waypoint page html page");
+        it("does not get waypoint page html page",(done)=> {
+            chai.request(app).get('/waypoints')
+                .end((err, res) => {
+                    res.text.should.contain("<div class=\"card-header\">Login</div>");
+                    done();
+                });
+        });
     });
     describe("user can do", ()=>{
-        it("can not go to create waypoint");
+        it("can not go to create waypoints",(done)=> {
+            user.get('/races/waypoints')
+                .end((err, res) => {
+                    res.text.should.not.contain( "<h1>Waypoint Aanmaken</h1>");
+                    expect(res).to.be.html;
+                    done();
+                });
+        });
         describe("check", ()=> {
             it("send incorrect details");
             it("send correct details");
@@ -304,8 +386,29 @@ describe("waypoints", ()=>{
             it("html show one races");
         });
         describe("location", ()=> {
-            it("send incorrect details");
-            it("send correct details");
+            it("send incorrect details",(done)=> {
+                admin.get('/races/waypoints/location')
+                    .set('Accept', 'application/json')
+                    .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
+                    .send('meters=200')
+                    .end((err, res) => {
+                        res.text.should.contain( "");
+                        expect(res).to.be.json;
+                        done();
+                    });
+                });
+                // it("send correct details",(done)=> {
+                //     admin.post('/races/waypoints/location')
+                //         .set('Accept', 'application/json')
+                //         .send('adress='+encodeURI('Onderwijsboulevard 5223 5223DJ \'s-Hertogenbosch'))
+                //         .send('meters=200')
+                //         .set('Content-Type', 'application/x-www-form-urlencoded')
+                //         .end((err, res) => {
+                //             res.text.should.contain( "Paleis Den Bosch");
+                //             expect(res).to.be.json;
+                //             done();
+                //         });
+                // });       
         });
     });
     describe("user can not do", ()=>{

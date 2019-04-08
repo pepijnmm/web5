@@ -5,7 +5,27 @@ var racesControllerhtml = require('../controllers/racesController_html');
 var races = require('../models/race');
 var jwt = require('jsonwebtoken');
 
-
+/**
+ * @swagger
+ *
+ * /races/locations:
+ *   post:
+ *     description: haal kroegen op basis van aantal meters van een adres
+ *     produces:
+ *       Json
+ *     parameters:
+ *       - name: adres
+ *         description: straatnummer:postcode:plaats:land
+ *         in: application/json
+ *         required: true
+ *         type: string
+ *       - name: meter
+ *         description: aantal meters
+ *         in: application/json
+ *         required: true
+ *         type: number
+ */
+router.post('/location',needjson, racesController.getlocations);
     /**
  * @swagger
  *
@@ -141,31 +161,10 @@ router.post('/', needjson,isAdmincheck, racesController.post);
  *         required: true
  *         type: string
  *     responses:
- *       200
+ *       200:
+ *         description: Haalt race met _id weg
  */
 router.delete('/:_id',needjson, isAdmincheck, racesController.delete);
-
-   /**
- * @swagger
- *
- * /races/locations:
- *   post:
- *     description: haal kroegen op basis van aantal meters van een adres
- *     produces:
- *       Json
- *     parameters:
- *       - name: adres
- *         description: straatnummer:postcode:plaats:land
- *         in: application/json
- *         required: true
- *         type: string
- *       - name: meter
- *         description: aantal meters
- *         in: application/json
- *         required: true
- *         type: number
- */
-router.post('/location',needjson, racesController.getlocations);
 
    /**
  * @swagger
@@ -182,7 +181,8 @@ router.post('/location',needjson, racesController.getlocations);
  *         required: true
  *         type: string
  *     responses:
- *       200
+ *       200:
+ *         description: Bewerk race met _id
  */
 router.put('/:_id',needjson, isAdmincheck, racesController.edit);
 
