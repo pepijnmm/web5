@@ -68,7 +68,7 @@ router.post('/:_oldid/waypoints/check/:_id',needjson, waypointsController.check)
  *         required: true
  *         type: string
  */
-router.delete('/:_id/waypoints',needjson,isAdmincheck, waypointsController.delete);
+router.delete('/:_oldid/waypoints/:_id',needjson,isAdmincheck, waypointsController.delete);
 
    /**
  * @swagger
