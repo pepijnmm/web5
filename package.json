@@ -3,8 +3,24 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "test": "./node_modules/.bin/mocha"
+    "start": "SET NODE_ENV=test& node ./bin/www",
+    "test": "nodemon --exec \"mocha --timeout 10000\"",
+    "coverage": "nyc --reporter=lcov --reporter=text-lcov npm test"
+  },
+  "nyc": {
+    "_comment": "Purpose of this part: to do code coverage within Mocha/Chai using Istanbul",
+    "register": "babel-register",
+    "include": [
+      "**/*.js",
+      "./*.js"
+    ],
+    "exclude": [
+      "**/node_modules/**",
+      "**/public/**",
+      "**/test/**",
+      "**/coverage/**"
+    ],
+    "all": true
   },
   "dependencies": {
     "bcrypt": "^3.0.5",
@@ -35,9 +51,8 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "chai-http": "^4.2.1",
     "mocha": "^5.0.2",
-    "supertest": "^3.0.0",
-    "mockgoose": "^8.0.1",
-    "supervisor": "^0.12.0"
+    "nyc": "^13.3.0"
   }
 }

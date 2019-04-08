@@ -208,7 +208,6 @@ function  needshtml(req, res, next) {
 }
 function  needjson(req, res, next) {
     if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
-        console.log('check');
         next();
     } else {
         next('route');

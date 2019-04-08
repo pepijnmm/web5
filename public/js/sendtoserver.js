@@ -46,8 +46,6 @@ function sendstuff(url, type, data, returnfunction=null){
         },
         data: data,
         success: function (data, textStatus, xhr) {
-            console.log(data);
-            console.log(xhr.status);
             if(data == 201 || data == 500 || data == 404 || xhr.status == 404 || xhr.status == 500 || xhr.status == 201){
                 if(returnfunction!= null){
                     returnfunction({nodata:false});
@@ -108,9 +106,7 @@ function getbars(e){
             accepts: {
                 text: "application/json"
             },
-            Authorization: jwt,
             beforeSend: function (xhr) {   //Include the bearer token in header
-                xhr.setRequestHeader("Authorization", 'Bearer '+ jwt);
                 xhr.setRequestHeader("Accept", "application/json");
             },
             success: function (data) {

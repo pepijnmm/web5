@@ -5,7 +5,7 @@ var waypointsControllerhtml = require('../controllers/waypointsController_html')
 var waypoints = require('../models/waypoint');
 var racesController = require('../controllers/racesController');
 
-router.get('/:_oldid/waypoints',isAdmincheck, needshtml, waypointsControllerhtml.getRace);
+router.get('/:_oldid/waypoints',isAdmincheck, needshtml, waypointsControllerhtml.getWaypoints);
 router.get('/:_oldid/waypoints/create',isAdmincheck,needshtml, waypointsControllerhtml.getCreate);
 router.post('/:_oldid/waypoints/create',isAdmincheck, waypointsController.posts);
 

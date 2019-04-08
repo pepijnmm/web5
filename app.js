@@ -25,8 +25,32 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-
-mongoose.connect('mongodb://localhost:27017/RestRace', { useNewUrlParser: true});
+var config = {
+    dev:{
+        app: {
+            port: 3000
+        },
+        db: {
+            host: 'localhost',
+            port: 27017,
+            name: 'RestRace'
+        }
+    },
+    test:{
+        app: {
+            port: 3000
+        },
+        db: {
+            host: 'localhost',
+            port: 27017,
+            name: 'test'
+        }
+    }
+};
+const env = process.env.NODE_ENV;
+config = config[env];
+const connectionString = `mongodb://${config.db.host}:${config.db.host}/${config.db.name}`;
+mongoose.connect(connectionString, { useNewUrlParser: true});
  let db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -52,51 +76,12 @@ mongoose.set('useFindAndModify', false);
 
 require('./config/passport')(passport);
 
-
-// var hbs = exphbs.create({
-//     extname: '.hbs',
-//     //layoutsDir: path.join(__dirname, '/views'),
-//     //defaultLayout: 'layout'
-// });
-//
-
-
-// view engine setup
-//app.engine('hbs', exphbs({layoutsDir: path.join(__dirname, '/views'),extname: '.hbs',defaultLayout: 'layout'}));
-//app.set('view engine', 'hbs');
 var hbs = exphbs.create({
     layoutsDir: path.join(__dirname, '/views'),
     defaultLayout: 'layout',
     extname: '.hbs',
     // Specify helpers which are only registered on this instance.
     helpers: {
-        ifcond: function (v1, operator, v2, options) {
-
-            switch (operator) {
-                case '==':
-                    return (v1 == v2) ? options.fn(this) : options.inverse(this);
-                case '===':
-                    return (v1 === v2) ? options.fn(this) : options.inverse(this);
-                case '!=':
-                    return (v1 != v2) ? options.fn(this) : options.inverse(this);
-                case '!==':
-                    return (v1 !== v2) ? options.fn(this) : options.inverse(this);
-                case '<':
-                    return (v1 < v2) ? options.fn(this) : options.inverse(this);
-                case '<=':
-                    return (v1 <= v2) ? options.fn(this) : options.inverse(this);
-                case '>':
-                    return (v1 > v2) ? options.fn(this) : options.inverse(this);
-                case '>=':
-                    return (v1 >= v2) ? options.fn(this) : options.inverse(this);
-                case '&&':
-                    return (v1 && v2) ? options.fn(this) : options.inverse(this);
-                case '||':
-                    return (v1 || v2) ? options.fn(this) : options.inverse(this);
-                default:
-                    return options.inverse(this);
-            }
-        }
     }
 });
 
@@ -147,14 +132,20 @@ app.use(passport.session());
 
 app.use('/', swaggerRouter);
 function isVerified(req, res, next) {
-    const bearerToken = req.cookies['token'];
+    var bearerToken = req.cookies['token'];
+    if(bearerToken == null){
+        if(req.headers['authorization'] != undefined && req.headers['authorization'] != null) {
+            bearerToken = req.headers['authorization'];
+            bearerToken = bearerToken.replace('Bearer ','');
+        }
+    }
     checktoken(bearerToken).then((fullfill)=>{
         req.verifiedUser = fullfill;
         next();
     }, (reject)=>{
         if(req.headers["accept"] != undefined && req.headers["accept"] == 'application/json')
         {
-            res.send(401);
+            res.sendStatus(401);
             return false;
         }
         res.redirect('/login');

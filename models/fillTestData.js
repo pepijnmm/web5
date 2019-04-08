@@ -25,6 +25,7 @@ let waypoint_seed = [
 let race_seed = [
     {
         _id: "Race den bosch",
+        isStarted:true,
         waypoints: [
             471587832
         ],

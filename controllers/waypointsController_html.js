@@ -4,7 +4,7 @@ var Waypoint = require('../models/waypoint');
 exports.getCreate = function(req, res, next) {
     return res.render('waypoint/create', {race_id: req.params._oldid})
 }
-exports.getRace = function(req, res, next) {
+exports.getWaypoints = function(req, res, next) {
     var query = {};
 
     if(req.params._oldid) {
@@ -15,8 +15,7 @@ exports.getRace = function(req, res, next) {
                 data[0].waypoints.forEach(element => {
                     arr.push(element)
                 });
-                var result = Waypoint.where('_id').in(arr)
-                    .byPage(req.query.pageIndex, req.query.pageSize);
+                var result = Waypoint.where('_id').in(arr);
 
                 result.then(data => {
                     if (req.params._id) {
