@@ -46,7 +46,7 @@ exports.get = function(req, res, next) {
         .hasWaypoint(req.query.hasWaypoint);
 
     result.then(data => {
-      if (req.params._id) {
+      if (req.params._id && data[0] != undefined) {
         data = data[0];
         todo = [];
         data.waypoints.forEach(waypoint => {

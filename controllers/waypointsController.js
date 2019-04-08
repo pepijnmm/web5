@@ -36,15 +36,22 @@ exports.posts = function(req, res, next) {
     }
     var result = Race.findById(req.params._oldid);
     result.then(data => {
-      var i = data.waypoints.length;
       req.body.bars.forEach((data2)=>{
-        data.waypoints.push(data2);
-        data.save();
-        var waypoint = new Waypoint({_id: data2, order: ++i});
-        i++;
-        waypoint.save(function (err) {
+        if(data.waypoints.indexOf(data2)<0) {
+          data.waypoints.push(data2);
+        }
+        Waypoint.findById(data2).then((way)=> {
+          if(way==null) {
+            var waypoint = new Waypoint({_id: data2});
+            waypoint.save(function (err) {
+            });
+          }
+          else{
+            return res.status(500);
+          }
         });
       });
+      data.save();
       return res.json(true);
     });
   }
@@ -52,24 +59,29 @@ exports.posts = function(req, res, next) {
 exports.check = function(req, res, next) {
   var user = req.verifiedUser.user;
   user = User.findById(user._id);
+  Waypoint.findById(req.params._id).then((waypoint)=>{
+  if(waypoint != null){
   user.then(user_data => {
-    if(!user_data.waypoints.includes(req.params._oldid + '.' + req.params._id)) {
-      res.io.emit("socketToMe", "users");
-      getLocation([req.params._id]).then((waypoints)=>{
-        waypoints.forEach((point)=> {
-          res.io.to('user').emit(req.params._oldid + "_waypoint", 'iemand is langs '+point.tags.name+' gekomen');
-          res.io.to('admin').emit(req.params._oldid + "_waypoint", 'iemand met het id: '+user_data.id + ' is langs '+point.tags.name+' gekomen');
+    if (!user_data.waypoints.includes(req.params._oldid + '.' + req.params._id)) {
+      getLocation([req.params._id]).then((waypoints) => {
+        waypoints.forEach((point) => {
+          res.io.to('user').emit(req.params._oldid + "_waypoint", 'iemand is langs ' + point.tags.name + ' gekomen');
+          res.io.to('admin').emit(req.params._oldid + "_waypoint", 'iemand met het id: ' + user_data.id + ' is langs ' + point.tags.name + ' gekomen');
         });
 
       });
       user_data.waypoints.push(req.params._oldid + '.' + req.params._id);
       user_data.save();
       return res.json(true);
-    }
-    else{
+    } else {
       return res.status(500);
     }
   });
+}
+  else{
+    return res.status(500).json(false);
+  }
+});
 }
 function getLocation(number) {
   const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];";
@@ -192,21 +204,26 @@ exports.fulldelete = function(req, res, next)
                   race.waypoints.splice(race.waypoints.indexOf(req.params._id), 1);
                   race.save();
                 }
+              User.find({waypoints: req.params._oldid+'.' + req.params._id}, (err, usersfind) => {
+                usersfind.forEach((user) => {
+                  index = [];
+                  const matches = user.waypoints.filter(s => s.includes(req.params._oldid+'.' + req.params._id));
+                  matches.forEach((match) => {
+                    i = user.waypoints.indexOf(match);
+                    user.waypoints.splice(i, 1);
+                  });
+                  user.save();
+                });
+                res.status(200);
+                res.send(true);
+              });
+            }
+            else{
+              res.status(500);
+              return res.send(false);
+
             }
           });
-            User.find({waypoints: req.params._oldid+'.' + req.params._id}, (err, usersfind) => {
-              usersfind.forEach((user) => {
-                index = [];
-                const matches = user.waypoints.filter(s => s.includes(req.params._oldid+'.' + req.params._id));
-                matches.forEach((match) => {
-                  i = user.waypoints.indexOf(match);
-                  user.waypoints.splice(i, 1);
-                });
-                user.save();
-              });
-              res.status(200);
-              res.send();
-            });
           }
       })
   }
