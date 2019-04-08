@@ -12,36 +12,40 @@ router.post('/:_oldid/waypoints/create',isAdmincheck, waypointsController.posts)
 /**
  * @swagger
  *
- * /races/_id/location:
+ * /races/location:
  *   post:
- *     description: Krijg informatie over een waypoint terug
+ *     description: 
  *     produces:
  *       Json
  *     parameters:
- *       - name: _id
- *         description:  het id van het aan te controlleren waypoint
+ *       - name: adres
+ *         description: straatnummer:postcode:plaats:land
+ *         in: application/json
+ *         required: true
+ *         type: string
+ *       - name: meter
+ *         description: aantal meters
  *         in: application/json
  *         required: true
  *         type: number
  */
-router.post('/:_id/location',needjson, waypointsController.location);
 
    /**
  * @swagger
  *
  * /races/_oldid/waypoints/check/id:
  *   post:
- *     description: kroeg toevoegen bij kroegen waar gebruiker is langs geweest
+ *     description: haal kroegen op basis van aantal meters van een adres
  *     produces:
  *       Json
  *     parameters:
- *       - name: _oldid
- *         description: id van de race die de gebruiker doet
+ *       - name: adres
+ *         description: straatnummer:postcode:plaats:land
  *         in: application/json
  *         required: true
- *         type: number
- *       - name: _id
- *         description: id van het waypoint die de gebruiker is langs geweest
+ *         type: string
+ *       - name: meter
+ *         description: aantal meters
  *         in: application/json
  *         required: true
  *         type: number
