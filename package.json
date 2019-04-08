@@ -7,6 +7,9 @@
     "test": "nodemon --exec \"mocha --timeout 10000\"",
     "coverage": "nyc --reporter=lcov --reporter=text-lcov mocha --timeout 28000 --exit"
   },
+  "engines": {
+    "node": "8.12.0"
+  },
   "nyc": {
     "_comment": "Purpose of this part: to do code coverage within Mocha/Chai using Istanbul",
     "register": "babel-register",
