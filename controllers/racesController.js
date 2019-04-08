@@ -48,8 +48,17 @@ exports.get = function(req, res, next) {
     result.then(data => {
       if (req.params._id) {
         data = data[0];
+        todo = [];
+        data.waypoints.forEach(waypoint => {
+          todo.push(waypoint);
+        });
+        getLocation(todo).then((waypoints) => {
+              return res.json({_id:data._id, isStarted:data.isStarted, waypoints:waypoints});
+        });
       }
-        return res.json(data);
+      else {
+          return res.json(data);
+      }
     }).catch(err => {
       console.log(err);
       res.status(err.status || 500);
@@ -225,7 +234,24 @@ exports.getlocations = function(req, res, next) {
   });
 }
 };
-    
+function getLocation(number) {
+  const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];";
+  query = "";
+  number.forEach((data) => {
+    query+="node(id:"+data+");out;";
+  })
+  return new Promise((resolve, reject) => {
+    unirest.get(stcafes + query)
+        .end(function (result) {
+          if (result.body.elements != null && result.body.elements.length > 0) {
+            resolve(result.body.elements);
+          } else {
+            resolve([]);
+          }
+
+        });
+  });
+}
  
 function returncoords(lat,long, distance){
   return "node[amenity=pub](around:"+distance+","+lat+","+long+");out;" +
