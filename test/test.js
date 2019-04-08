@@ -242,13 +242,13 @@ describe("race", ()=>{
         });
         describe("get one races", ()=> {
             it("json show one races",(done)=> {
-                admin.get('/races/'+"Race den bosch")
+                admin.get('/races/'+"Arnhem bierdag")
                     .set('Accept', 'application/json')
                     .end((err, res) => {
-                        res.text.should.contain( "Race den bosch");
+                        res.text.should.contain( "Arnhem bierdag");
                         expect(res).to.be.json;
-                        res.text.should.not.contain( "Arnhem bierdag");
-                        expect(JSON.parse(res.text).waypoints[0].tags.name).to.equal("Tic Tac");
+                        res.text.should.not.contain( "Race den bosch");
+                        expect(JSON.parse(res.text).waypoints[0].tags.name).to.equal("De Smidse");
                         done();
                     });
             });
@@ -346,11 +346,27 @@ describe("race", ()=>{
                     });
                 });
             });
-            it("can not change function if no race is found");
-        });
-        describe("delete", ()=> {
-            it("can delete race");
-            it("can not do delete function if no race is found");
+            it("can not change function if no race is found", (done)=> {
+                Race.findById('testchang').then((data)=>{
+                    expect(data).to.be.null;
+                    Race.findById('Race den bosch').then((data)=> {
+                        expect(data).to.be.null;
+                        admin.put('/races/Race den bosch')
+                            .send('_id=testchang')
+                            .set('Accept', 'application/json')
+                            .end((err, res) => {
+                                res.should.have.status(500);
+                                Race.findById('Race den bosch').then((data)=> {
+                                    expect(data).to.be.null;
+                                    Race.findById('testchang').then((data)=> {
+                                        expect(data).to.be.null;
+                                        done();
+                                    });
+                                });
+                            });
+                    });
+                });
+            });
         });
     });
 });
@@ -374,12 +390,31 @@ describe("waypoints", ()=>{
                 });
         });
         describe("check", ()=> {
-            it("send incorrect details");
-            it("send correct details");
-        });
-        describe("get one races", ()=> {
-            it("json show one races");
-            it("html show one races");
+            it("send incorrect details",(done)=> {
+                user.post('/races/Race den bosch/waypoints/check/47158897832')
+                    .set('Accept', 'application/json')
+                    .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
+                    .send('meters=200')
+                    .end((err, res) => {
+                        res.text.should.contain( "");
+                        expect(res).to.be.json;
+                        res.should.have.status(500);
+                        done();
+                    });
+            });
+            it("send correct details"
+                ,(done)=> {
+                user.post('/races/Race den bosch/waypoints/check/471587832')
+                    .set('Accept', 'application/json')
+                    .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
+                    .send('meters=200')
+                    .end((err, res) => {
+                        res.text.should.contain( "true");
+                        expect(res).to.be.json;
+                        done();
+                    });
+            }
+            );
         });
         describe("location", ()=> {
             it("send incorrect details",(done)=> {
@@ -410,13 +445,11 @@ describe("waypoints", ()=>{
     describe("user can not do", ()=>{
         describe("posts", ()=> {
             it("cannot send data to posts function",(done)=> {
-                user.post('/races/location')
+                user.post('/races/Arnhem bierdag/waypoints/create')
                     .set('Accept', 'application/json')
-                    .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
-                    .send('meters=200')
+                    .send('bars=[\'471587846\',\'471587850\']')
                     .end((err, res) => {
-                        res.text.should.contain( "");
-                        expect(res).to.be.json;
+                        expect(res).to.be.html;
                         done();
                     });
             });
@@ -424,17 +457,44 @@ describe("waypoints", ()=>{
     });
     describe("admin can do", ()=>{
         describe("getWaypoints", ()=> {
-            it("can get data");
-        });
-        describe("getCreate", ()=> {
-            it("can get data");
+            it("can get data",(done)=> {
+                admin.post('/races/471587846/location')
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        expect(res).to.be.json;
+                        res.text.should.contain("De Saeck");
+                        done();
+                    });
+            });
         });
         describe("posts", ()=> {
-            it("can add new waypoints");
+            it("can add new waypoints",(done)=> {
+                admin.post('/races/Arnhem bierdag/waypoints/create')
+                    .set('Accept', 'application/json')
+                    .send({bars:[ '471587832', '471587844', '471587846', '471587848' ]})
+                    .end((err, res) => {
+                        expect(res).to.be.json;
+                        expect(res.text).to.be.equal('true');
+                        Waypoint.findById(471587832).then((waypoint)=>{
+                            expect(waypoint._id).to.be.equal(471587832);
+                            done();
+                        });
+                    });
+            });
         });
         describe("delete", ()=> {
-            it("can delete change race");
-            it("can not do delete function if no race is found");
+            it("can delete change race",(done)=> {
+                admin.delete('/races/Arnhem bierdag/waypoints/471587846')
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        expect(res.text).to.be.equal('true');
+                        Race.findById('Arnhem bierdag').then((race) => {
+                            race.waypoints.toString().should.not.contain('471587846');
+                            done();
+                        });
+                    });
+            });
         });
     });
 });

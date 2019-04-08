@@ -6,19 +6,15 @@ User = mongoose.model('User');
 let waypoint_seed = [
     {
         _id: 471587832,
-        order: 1,
     },
     {
         _id: 471587844,
-        order: 1,
     },
     {
         _id: 471587846,
-        order: 2,
     },
     {
         _id: 471587848,
-        order: 3,
     }
 ];
 

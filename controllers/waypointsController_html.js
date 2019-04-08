@@ -11,7 +11,8 @@ exports.getWaypoints = function(req, res, next) {
         query._id = req.params._oldid;
         var result = Race.find(query);
         result.then(data => {
-                arr = [];
+            if (data != null && data.length > 0){
+                    arr = [];
                 data[0].waypoints.forEach(element => {
                     arr.push(element)
                 });
@@ -28,6 +29,11 @@ exports.getWaypoints = function(req, res, next) {
                     res.status(err.status || 500);
                     res.render('error');
                 });
+            }
+            else{
+                res.status(500);
+                res.render('error');
+            }
         });
     }
     else{
