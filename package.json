@@ -1,15 +1,14 @@
 {
   "name": "assessment-1819-pepijn-christian",
   "version": "0.0.0",
-  "engines": {
-    "node": "8.12.0",
-    "npm": "6.4.1"
-  },
   "private": true,
   "scripts": {
     "start": "SET NODE_ENV=test& node ./bin/www",
     "test": "nodemon --exec \"mocha --timeout 10000\"",
     "coverage": "nyc --reporter=lcov --reporter=text-lcov mocha --timeout 28000 --exit"
+  },
+  "engines": {
+    "node": "8.12.0"
   },
   "nyc": {
     "_comment": "Purpose of this part: to do code coverage within Mocha/Chai using Istanbul",
