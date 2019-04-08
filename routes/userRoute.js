@@ -7,8 +7,33 @@ var passport = require('passport');
 require('../config/passport')(passport);
 var userController = require('../controllers/userController');
 
+    
     router.get('/login', userController.isVerified, userController.getLogin);
-    router.post('/login', userController.login);
+    /**
+ * @swagger
+ *
+ * /login:
+ *   post:
+ *     description: Gain token to access API
+ *     produces:
+ *       - JWT
+ *     parameters:
+ *       - name: email
+ *         description: email to use for login.
+ *         in: x-www-form-urlencoded
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: User's password.
+ *         in: x-www-form-urlencoded
+ *         required: true
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: login
+ */
+    router.post('/login', needjson, userController.loginJson);
+    router.post('/login', needshtml, userController.loginHtml);
     router.get('/logout', userController.isVerified, userController.getLogout);
     router.get('/profile', userController.isVerified, userController.getProfile);
     router.get('/signup', userController.getSignUp);
@@ -27,4 +52,19 @@ var userController = require('../controllers/userController');
     router.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
     router.get('/auth/google/callback', userController.googleCallback);
     router.get('/auth/facebook/callback', userController.facebookCallback);
+
+    function  needshtml(req, res, next) {
+        if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
+            next('route')
+        }
+        else{next();}
+    }
+    function  needjson(req, res, next) {
+        if (req.headers["accept"] != undefined && req.headers["accept"] == 'application/json') {
+            next();
+        } else {
+            next('route');
+        }
+    }
+
     module.exports = router;
