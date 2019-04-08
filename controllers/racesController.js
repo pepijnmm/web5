@@ -62,7 +62,7 @@ exports.get = function(req, res, next) {
     }).catch(err => {
       console.log(err);
       res.status(err.status || 500);
-      res.render('error');
+      res.sendStatus(500);
     });
 
   }
@@ -81,7 +81,7 @@ exports.post = function(req, res, next) {
     {
       console.log(err);
       res.status(err.status || 500);
-      res.render('error');
+      res.sendStatus(500);
     }
     else{
       return res.json(race);
@@ -95,7 +95,7 @@ exports.post = function(req, res, next) {
         {
           console.log(err);
           res.status(err.status || 500);
-          res.render('error');
+          res.sendStatus(500);
         }
         else{
           User.find({waypoints: new RegExp('^'+req.params._id+'\..*')}, (err, usersfind) => {
@@ -141,13 +141,13 @@ exports.post = function(req, res, next) {
           {
             console.log(err);
             res.status(err.status || 500);
-            res.render('error');
+            res.sendStatus(500);
           }
           else{
             Race.findByIdAndDelete(req.params._id, function(err) {
               if (err) {
                 res.status(err.status || 500);
-                res.render('error');
+                res.sendStatus(500);
               } else {
                 User.find({waypoints: new RegExp('^'+req.params._id+'\..*')}, (err, usersfind) => {
                   usersfind.forEach((user) => {
@@ -161,7 +161,7 @@ exports.post = function(req, res, next) {
                       });
                     user.save();
                   });
-                  return res.json(race);
+                  return res.sendStatus(200);
                 });
               }
             });
@@ -169,7 +169,7 @@ exports.post = function(req, res, next) {
       }
       else{
         res.status(500);
-        res.render('error');
+        res.sendStatus(200);
       }
     });
   }

@@ -51,41 +51,22 @@ router.post('/:_oldid/waypoints/check/:_id',needjson, waypointsController.check)
    /**
  * @swagger
  *
- * /races/_oldid/waypoints/check/id:
- *   post:
- *     description: Controleren of dat er mensen langs een locatie zijn gekomen
+ * /races/_id/waypoints/:
+ *   delete:
+ *     description: Verwijder een waypoint
  *     produces:
  *       Json
  *     parameters:
- *       - name: _oldid
- *         description: moet nog beschreven worden
- *         in: params
- *         required: true
- *         type: string
  *       - name: id
- *         description: moet nog beschreven worden
+ *         description: Id van te verwijderen waypoint
  *         in: params
  *         required: true
  *         type: string
+ *     responses:
+ *       201:
+ *         description: waypoint deleted
  */
 router.delete('/:_id/waypoints',needjson,isAdmincheck, waypointsController.delete);
-
-   /**
- * @swagger
- *
- * /races/waypoints:
- *   post:
- *     description: Aanmaken van een waypoint
- *     produces:
- *       Json
- *     parameters:
- *       - name: _id
- *         description: het id van het aan te maken waypoint
- *         in: body
- *         required: true
- *         type: string
- */
-router.post('/', waypointsController.post);
 
 function isAdmincheck(req, res, next)
 {

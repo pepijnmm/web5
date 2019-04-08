@@ -107,6 +107,7 @@ exports.location = function(req, res, next) {
 
 exports.post = function(req, res, next) {
   Race.findById(req.params._id, (err, race) => {
+    console.log("hallo");
   if(err)
     {
       console.log(err);
@@ -130,7 +131,7 @@ exports.post = function(req, res, next) {
         {
           console.log(err);
           res.status(err.status || 500);
-          res.render('error');
+          res.sendStatus(500);
         }
         else{
           race.save();
