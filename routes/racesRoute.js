@@ -161,7 +161,8 @@ router.post('/', needjson,isAdmincheck, racesController.post);
  *         required: true
  *         type: string
  *     responses:
- *       200
+ *       200:
+ *         description: Haalt race met _id weg
  */
 router.delete('/:_id',needjson, isAdmincheck, racesController.delete);
 
@@ -180,7 +181,8 @@ router.delete('/:_id',needjson, isAdmincheck, racesController.delete);
  *         required: true
  *         type: string
  *     responses:
- *       200
+ *       200:
+ *         description: Bewerk race met _id
  */
 router.put('/:_id',needjson, isAdmincheck, racesController.edit);
 
