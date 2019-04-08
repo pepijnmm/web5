@@ -4,7 +4,7 @@ var Waypoint = require('../models/waypoint');
 exports.getCreate = function(req, res, next) {
     return res.render('waypoint/create', {race_id: req.params._oldid})
 }
-exports.getRace = function(req, res, next) {
+exports.getWaypoints = function(req, res, next) {
     var query = {};
 
     if(req.params._oldid) {

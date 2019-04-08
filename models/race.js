@@ -8,6 +8,7 @@ let raceSchema = mongoose.Schema({
     isStarted: {
         type: Boolean,
         default: false,
+        required: true,
     },
     waypoints: [{type: Number, ref: 'Waypoint'}]
 },{

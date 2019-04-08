@@ -25,8 +25,32 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-
-mongoose.connect('mongodb://localhost:27017/RestRace', { useNewUrlParser: true});
+var config = {
+    dev:{
+        app: {
+            port: 3000
+        },
+        db: {
+            host: 'localhost',
+            port: 27017,
+            name: 'RestRace'
+        }
+    },
+    test:{
+        app: {
+            port: 3000
+        },
+        db: {
+            host: 'localhost',
+            port: 27017,
+            name: 'test'
+        }
+    }
+};
+const env = process.env.NODE_ENV;
+config = config[env];
+const connectionString = `mongodb://${config.db.host}:${config.db.host}/${config.db.name}`;
+mongoose.connect(connectionString, { useNewUrlParser: true});
  let db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
