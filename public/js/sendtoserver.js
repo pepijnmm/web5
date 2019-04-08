@@ -106,9 +106,7 @@ function getbars(e){
             accepts: {
                 text: "application/json"
             },
-            Authorization: jwt,
             beforeSend: function (xhr) {   //Include the bearer token in header
-                xhr.setRequestHeader("Authorization", 'Bearer '+ jwt);
                 xhr.setRequestHeader("Accept", "application/json");
             },
             success: function (data) {

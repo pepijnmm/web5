@@ -13,87 +13,257 @@ let app = require('../app').app;
 let should = chai.should();
 const expect = chai.expect;
 
-//
-// let chai = require('chai');
-// let chaiHttp = require('chai-http');
-// //let server = require('../server');
-// let should = chai.should();
-
-
-// const chai = require('chai');
-// const chaiHttp = require('chai-http');
-// const expect = chai.expect;
-// const mlog = require('mocha-logger');
- //const request = require('supertest');
-// const should = require('chai').should();
 chai.use(chaiHttp);
-// describe('RemoveEverything', () => {
-//
-// });
+var admin = chai.request.agent(app);
+var user = chai.request.agent(app);
+var tokenadmin = '';
+var tokenuser = '';
 describe("usersettings", ()=>{
-    before((done) => { //Before each test we empty the
-        // Race.collection.drop();
-        // User.collection.drop();
-        // Waypoint.collection.drop();
-        // Race.find({}).then(race => {
-        //     if(!race.length){
-        //         require('../models/fillTestData')
-        //             .then()
-        //             .catch();
-        //     }
-        // });
-        done();
+    before( (done) => { //Before each test we empty the
+         Race.find({}).then(race => {
+            Race.collection.drop();
+             User.collection.drop();
+             Waypoint.collection.drop().then(()=>{
+                 Race.find({}).then(race => {
+                     if (!race.length) {
+                         require('../models/fillTestData')
+                             .then(() => {
+                                 done();
+                             })
+                             .catch(() => {
+                             });
+
+                     } else {
+                         done();
+                     }
+                 });
+             });
+        });
     });
     after(function() {
         // runs after all tests in this block
     });
-    describe("should login", ()=>{
+    describe("login", ()=>{
         it("should accept password and email",(done)=> {
-            chai.request(app).post('/login')
-                .field('email', 'admin@gmail.com')
-                .field('password', 'test123')
+            admin.post('/login')
+                .send('email=admin@gmail.com')
+                .send('password=test123')
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .end((err, res) => {
-                    !res.should.have.status(200);
-                    expect('Location', '/login');
+                    res.should.have.status(201);
+                    res.text.should.not.contain("No user found");
+                    //console.log(res.req.res.headers['set-cookie']);
+                    tokenadmin = res.text;
+                });
+            user.post('/login')
+                .send('email=test123@gmail.com')
+                .send('password=test123')
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    res.text.should.not.contain("No user found");
+                    //console.log(res.req.res.headers['set-cookie']);
+                    tokenuser = res.text;
                     done();
                 });
         });
-        it("should not accept wrong email for user");
-        it("should not accept wrong password for user");
-        it("should show profile page");
+        it("should not accept wrong email for user",(done)=> {
+            chai.request(app).post('/login')
+                .send('email=hoi@gmail.com')
+                .send('password=test123')
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+        it("should not accept wrong password for user",(done)=> {
+            chai.request(app).post('/login')
+                .send('email=admin@gmail.com')
+                .send('password=test')
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.should.contain("Wrong password");
+                    done();
+                });
+        });
+        it("should show profile page",(done)=> {
+            var requester = chai.request.agent(app);
+            requester.post('/login')
+                .send('email=admin@gmail.com')
+                .send('password=test123')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    expect(res).to.be.html;
+                    res.text.should.include("<div class=\"card-header\">Profile</div>");
+                    requester.close();
+                    done();
+                });
+        });
     });
-    describe("should logout", ()=>{
-        it("should logout");
-        it("is already logout");
+    describe("logout", ()=>{
+        it("should logout",(done)=>{
+            chai.request(app).get('/logout')
+            .set('Authorization', tokenuser)
+            .end((err, res) => {
+                res.should.have.status(200);
+                expect(res).to.be.html;
+                res.text.should.include("<div class=\"card-header\">Login</div>");
+                done();
+            });});
+        it("is already logout",(done)=> {
+            chai.request(app).post('/logout')
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.text.should.contain("Unauthorized");
+                    done();
+                });});
     });
-    describe("should signin", ()=>{
-        it('should signin');
-    });
-    describe("should notsignin", ()=>{
-        it("account already in use");
-        it("email doesnt meet the requirments");
-        it("password doesnt meet the requirments");
+    describe("signup", ()=>{
+        it('should signup',(done)=> {
+            chai.request(app).post('/signup')
+                .send('email=admin123@gmail.com')
+                .send('password=testtest123')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.text.should.contain("<div class=\"card-header\">Login</div>");
+                    done();
+                });
+        });
+        it("account already in use",(done)=> {
+            chai.request(app).post('/signup')
+                .send('email=admin123@gmail.com')
+                .send('password=testtest1343')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.text.should.contain("email taken");
+                    done();
+                });
+        });
+        it("email doesnt meet the requirments",(done)=> {
+            chai.request(app).post('/signup')
+                .send('email=admin.123@gmail.com')
+                .send('password=testtest1343')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.text.should.contain("User validation failed: local.email: Email is not in the right format");
+                    done();
+                });
+        });
+        it("password doesnt meet the requirments",(done)=> {
+            chai.request(app).post('/signup')
+                .send('email=admin1234@gmail.com')
+                .send('password=tes')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .end((err, res) => {
+                    res.text.should.contain("Password must be length of 8 and contain 1 letter and 1 number");
+                    done();
+                });
+        });
     });
 });
 describe("race", ()=>{
     describe("not signin can do", ()=> {
-        it("does not get races html page");
+        it("does not get races html page",(done)=> {
+            chai.request(app).get('/races')
+                .end((err, res) => {
+                    res.text.should.contain("<div class=\"card-header\">Login</div>");
+                    done();
+                });
+        });
     });
     describe("user can do", ()=>{
-        it("can not go to create races");
+        it("can not go to create races",(done)=> {
+            user.get('/races')
+                .end((err, res) => {
+                    res.text.should.not.contain( "<h1>Races Aanmaken</h1>");
+                    expect(res).to.be.html;
+                    done();
+                });
+        });
         describe("getlocation", ()=> {
-            it("send incorrect details");
-            it("send correct detauls");
+            it("send incorrect details",(done)=> {
+                admin.get('/races')
+                    .set('Accept', 'application/json')
+                    .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
+                    .send('meters=200')
+                    .end((err, res) => {
+                        res.text.should.contain( "");
+                        expect(res).to.be.json;
+                        done();
+                    });
+            });
+            it("send correct details",(done)=> {
+                admin.post('/races/location')
+                    .set('Accept', 'application/json')
+                    .send('adress='+encodeURI('Onderwijsboulevard 5223 5223DJ \'s-Hertogenbosch'))
+                    .send('meters=200')
+                    .set('Content-Type', 'application/x-www-form-urlencoded')
+                    .end((err, res) => {
+                        res.text.should.contain( "Paleis Den Bosch");
+                        expect(res).to.be.json;
+                        done();
+                    });
+            });
         });
         describe("getAll races", ()=> {
-            it("json show all races");
-            it("html show all races");
+            it("json show user races",(done)=> {
+                user.get('/races')
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        expect(JSON.parse(res.text).length).to.equal(1);
+                        expect(res).to.be.json;
+                        done();
+                    });
+            });
+            it("json show admin races",(done)=> {
+                admin.get('/races')
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        expect(JSON.parse(res.text).length).to.equal(2);
+                        expect(res).to.be.json;
+                        done();
+                    });
+            });
+            it("html show all races",(done)=> {
+                admin.get('/races')
+                    .end((err, res) => {
+                        res.text.should.contain( "Race den bosch");
+                        expect(res).to.be.html;
+                        res.text.should.contain( "Arnhem bierdag");
+                        done();
+                    });
+            });
         });
         describe("get one races", ()=> {
-            it("json show one races");
-            it("html show one races");
+            it("json show one races",(done)=> {
+                admin.get('/races/'+"Race den bosch")
+                    .set('Accept', 'application/json')
+                    .end((err, res) => {
+                        res.text.should.contain( "Race den bosch");
+                        expect(res).to.be.json;
+                        res.text.should.not.contain( "Arnhem bierdag");
+                        done();
+                    });
+            });
+            it("html show one races",(done)=> {
+                admin.get('/races/'+"Race den bosch")
+                    .end((err, res) => {
+                        res.text.should.contain( "Race den bosch");
+                        expect(res).to.be.html;
+                        res.text.should.not.contain( "Arnhem bierdag");
+                        done();
+                    });
+            });
         });
     });
     describe("user can not do", ()=>{

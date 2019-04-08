@@ -76,51 +76,12 @@ mongoose.set('useFindAndModify', false);
 
 require('./config/passport')(passport);
 
-
-// var hbs = exphbs.create({
-//     extname: '.hbs',
-//     //layoutsDir: path.join(__dirname, '/views'),
-//     //defaultLayout: 'layout'
-// });
-//
-
-
-// view engine setup
-//app.engine('hbs', exphbs({layoutsDir: path.join(__dirname, '/views'),extname: '.hbs',defaultLayout: 'layout'}));
-//app.set('view engine', 'hbs');
 var hbs = exphbs.create({
     layoutsDir: path.join(__dirname, '/views'),
     defaultLayout: 'layout',
     extname: '.hbs',
     // Specify helpers which are only registered on this instance.
     helpers: {
-        ifcond: function (v1, operator, v2, options) {
-
-            switch (operator) {
-                case '==':
-                    return (v1 == v2) ? options.fn(this) : options.inverse(this);
-                case '===':
-                    return (v1 === v2) ? options.fn(this) : options.inverse(this);
-                case '!=':
-                    return (v1 != v2) ? options.fn(this) : options.inverse(this);
-                case '!==':
-                    return (v1 !== v2) ? options.fn(this) : options.inverse(this);
-                case '<':
-                    return (v1 < v2) ? options.fn(this) : options.inverse(this);
-                case '<=':
-                    return (v1 <= v2) ? options.fn(this) : options.inverse(this);
-                case '>':
-                    return (v1 > v2) ? options.fn(this) : options.inverse(this);
-                case '>=':
-                    return (v1 >= v2) ? options.fn(this) : options.inverse(this);
-                case '&&':
-                    return (v1 && v2) ? options.fn(this) : options.inverse(this);
-                case '||':
-                    return (v1 || v2) ? options.fn(this) : options.inverse(this);
-                default:
-                    return options.inverse(this);
-            }
-        }
     }
 });
 
@@ -184,7 +145,7 @@ function isVerified(req, res, next) {
     }, (reject)=>{
         if(req.headers["accept"] != undefined && req.headers["accept"] == 'application/json')
         {
-            res.send(401);
+            res.sendStatus(401);
             return false;
         }
         res.redirect('/login');

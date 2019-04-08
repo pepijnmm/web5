@@ -37,7 +37,9 @@ exports.get = function(req, res, next) {
     if (req.params._id) {
       query._id = req.params._id;
     }
-
+  if(req.verifiedUser.user.isAdmin != true) {
+    query.isStarted = true;
+  }
     var result = Race.find(query)
         .byPage(req.query.pageIndex, req.query.pageSize)
         .byStarted(req.query.byStarted)
@@ -205,7 +207,7 @@ exports.getlocations = function(req, res, next) {
       endcafes = "";
   if(req.body.adress && req.body.adress != "" && req.body.meters != ""){
   unirest.get(urllatlong + req.body.adress + urllatlongend).header("User-Agent", "racedrinkgame").header("Accept", "application/json").end(function (result) {
-    if (result.body[0] != "" || result.body != undefined) {
+    if (result.body[0] != "" && result.body != undefined && result.body.length != 0) {
       const lat = parseFloat(result.body[0]["lat"]),
           long = parseFloat(result.body[0]["lon"]);
       unirest.get(stcafes + returncoords(lat, long, req.body.meters) + endcafes)

@@ -1,15 +1,13 @@
 <div class="container">
     <section class="content-header">
-        <h1>
-            Waypoint Aanmaken
-        </h1>
+        <h1>Waypoint Aanmaken</h1>
     </section>
     <section class="content">
         <div class="row">
             <div class="box box-body">
                 <form id="formpage" class="createrace" action="/races/{{race_id}}/waypoints/create" method="POST">
                     <div class="form-group">
-                        <label>adress: </label>
+                        <label>adress(straat huisnummer postcode(aan elkaar) land: </label>
                         <input type="text" name="adress" required autofocus>
                         <label>Meters: </label>
                         <input type="text" name="meters" required autofocus>

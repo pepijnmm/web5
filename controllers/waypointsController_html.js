@@ -15,8 +15,7 @@ exports.getWaypoints = function(req, res, next) {
                 data[0].waypoints.forEach(element => {
                     arr.push(element)
                 });
-                var result = Waypoint.where('_id').in(arr)
-                    .byPage(req.query.pageIndex, req.query.pageSize);
+                var result = Waypoint.where('_id').in(arr);
 
                 result.then(data => {
                     if (req.params._id) {
