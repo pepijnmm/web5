@@ -238,6 +238,9 @@ exports.getlocations = function(req, res, next) {
     }
   });
 }
+  else {
+    return res.json(null);
+  }
 };
 function getLocation(number) {
   const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];";
