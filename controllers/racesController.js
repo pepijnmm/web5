@@ -61,8 +61,8 @@ exports.get = function(req, res, next) {
       }
     }).catch(err => {
       console.log(err);
-      res.status(err.status || 404);
-      return res.sendStatus(404);
+      res.status(err.status || 500);
+      res.render('error');
     });
 
   }
@@ -161,7 +161,7 @@ exports.post = function(req, res, next) {
                       });
                     user.save();
                   });
-                  return res.sendStatus(200);
+                  return res.json(race);
                 });
               }
             });

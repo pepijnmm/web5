@@ -182,7 +182,7 @@ router.delete('/:_id',needjson, isAdmincheck, racesController.delete);
  *         type: string
  *     responses:
  *       200:
- *         description: OK
+ *         description: Bewerk race met _id
  */
 router.put('/:_id',needjson, isAdmincheck, racesController.edit);
 
