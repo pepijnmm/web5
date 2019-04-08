@@ -360,10 +360,23 @@ describe("race", ()=>{
 });
 describe("waypoints", ()=>{
     describe("not signin can do", ()=> {
-        it("does not get waypoint page html page");
+        it("does not get waypoint page html page",(done)=> {
+            chai.request(app).get('/waypoints')
+                .end((err, res) => {
+                    res.text.should.contain("<div class=\"card-header\">Login</div>");
+                    done();
+                });
+        });
     });
     describe("user can do", ()=>{
-        it("can not go to create waypoint");
+        it("can not go to create waypoints",(done)=> {
+            user.get('/races/waypoints')
+                .end((err, res) => {
+                    res.text.should.not.contain( "<h1>Waypoint Aanmaken</h1>");
+                    expect(res).to.be.html;
+                    done();
+                });
+        });
         describe("check", ()=> {
             it("send incorrect details");
             it("send correct details");
@@ -373,8 +386,29 @@ describe("waypoints", ()=>{
             it("html show one races");
         });
         describe("location", ()=> {
-            it("send incorrect details");
-            it("send correct details");
+            it("send incorrect details",(done)=> {
+                admin.get('/races/waypoints/location')
+                    .set('Accept', 'application/json')
+                    .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
+                    .send('meters=200')
+                    .end((err, res) => {
+                        res.text.should.contain( "");
+                        expect(res).to.be.json;
+                        done();
+                    });
+                });
+                // it("send correct details",(done)=> {
+                //     admin.post('/races/waypoints/location')
+                //         .set('Accept', 'application/json')
+                //         .send('adress='+encodeURI('Onderwijsboulevard 5223 5223DJ \'s-Hertogenbosch'))
+                //         .send('meters=200')
+                //         .set('Content-Type', 'application/x-www-form-urlencoded')
+                //         .end((err, res) => {
+                //             res.text.should.contain( "Paleis Den Bosch");
+                //             expect(res).to.be.json;
+                //             done();
+                //         });
+                // });       
         });
     });
     describe("user can not do", ()=>{
