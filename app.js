@@ -46,10 +46,10 @@ var config = {
             name: 'test'
         }
     }
-};
+};  
 const env = process.env.NODE_ENV;
 config = config[env];
-const connectionString = `mongodb://${config.db.host}:${config.db.host}/${config.db.name}`;
+const connectionString = `mongodb+srv://ccjspijk:5Kv4uwATLKUgsU6z@cluster0-mwffb.mongodb.net/test?retryWrites=true`;
 mongoose.connect(connectionString, { useNewUrlParser: true});
  let db = mongoose.connection;
 
