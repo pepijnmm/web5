@@ -173,8 +173,7 @@ exports.post = function(req, res, next) {
           }});
       }
       else{
-        res.status(500);
-        res.sendStatus(200);
+        res.sendStatus(500);
       }
     });
   }
