@@ -21,21 +21,17 @@ var tokenuser = '';
 describe("usersettings", ()=>{
     before( (done) => { //Before each test we empty the
          Race.find({}).then(race => {
-            Race.collection.drop();
-             User.collection.drop();
-             Waypoint.collection.drop().then(()=>{
-                 Race.find({}).then(race => {
-                     if (!race.length) {
+            if(race!=null)Race.collection.drop();
+             User.find({}).then(user => {
+                 if(user!=null)User.collection.drop();
+                 Waypoint.find({}).then(waypoint => {
+                     if(waypoint!=null)Waypoint.collection.drop();
                          require('../models/fillTestData')
                              .then(() => {
                                  done();
                              })
                              .catch(() => {
                              });
-
-                     } else {
-                         done();
-                     }
                  });
              });
         });
@@ -252,7 +248,7 @@ describe("race", ()=>{
                         res.text.should.contain( "Race den bosch");
                         expect(res).to.be.json;
                         res.text.should.not.contain( "Arnhem bierdag");
-                        JSON.parse(res.text).waypoints[0].tags.name.contain("De Saeck");
+                        expect(JSON.parse(res.text).waypoints[0].tags.name).to.equal("Tic Tac");
                         done();
                     });
             });
@@ -387,7 +383,7 @@ describe("waypoints", ()=>{
         });
         describe("location", ()=> {
             it("send incorrect details",(done)=> {
-                admin.get('/races/waypoints/location')
+                admin.post('/races/location')
                     .set('Accept', 'application/json')
                     .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
                     .send('meters=200')
@@ -397,23 +393,33 @@ describe("waypoints", ()=>{
                         done();
                     });
                 });
-                // it("send correct details",(done)=> {
-                //     admin.post('/races/waypoints/location')
-                //         .set('Accept', 'application/json')
-                //         .send('adress='+encodeURI('Onderwijsboulevard 5223 5223DJ \'s-Hertogenbosch'))
-                //         .send('meters=200')
-                //         .set('Content-Type', 'application/x-www-form-urlencoded')
-                //         .end((err, res) => {
-                //             res.text.should.contain( "Paleis Den Bosch");
-                //             expect(res).to.be.json;
-                //             done();
-                //         });
-                // });       
+                it("send correct details",(done)=> {
+                    admin.post('/races/location')
+                        .set('Accept', 'application/json')
+                        .send('adress='+encodeURI('Onderwijsboulevard 5223 5223DJ \'s-Hertogenbosch'))
+                        .send('meters=200')
+                        .set('Content-Type', 'application/x-www-form-urlencoded')
+                        .end((err, res) => {
+                            res.text.should.contain( "Paleis Den Bosch");
+                            expect(res).to.be.json;
+                            done();
+                        });
+                });
         });
     });
     describe("user can not do", ()=>{
         describe("posts", ()=> {
-            it("cannot send data to posts function");
+            it("cannot send data to posts function",(done)=> {
+                user.post('/races/location')
+                    .set('Accept', 'application/json')
+                    .send('adress=Onderwijsboulevard 5223 5223 DJ \'s-Hertogenbosch')
+                    .send('meters=200')
+                    .end((err, res) => {
+                        res.text.should.contain( "");
+                        expect(res).to.be.json;
+                        done();
+                    });
+            });
         });
     });
     describe("admin can do", ()=>{

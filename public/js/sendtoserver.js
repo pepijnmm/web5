@@ -1,25 +1,37 @@
 jwt = document.cookie.split(";")[0].split("=")[1];
 $('form').submit(function(e) {
-if($(this).hasClass( "sendtoserver")) {
-    e.preventDefault(); // ignore button
-    var form = $(this);
-    var url = form.attr('action');
-    var type = form.attr('method');
-    type = (type != null || type != undefined)?type: "POST";
-    sendstuff(url,type, form.serialize())
-}
-if($(this).hasClass( "createrace")) {
-    e.preventDefault(); // ignore button
-    var form = $(this);
-    var url = form.attr('action');
-    var type = form.attr('method');
-    type = (type != null || type != undefined)?type: "POST";
-    sendstuff(url,type, form.serialize(), (data)=>{
-        if(data != false){
-            window.location.href = window.location.href.replace(window.location.href.split('/').pop(),'');
-        }
-    })
-}
+    if($(this).hasClass( "sendtoserver")) {
+        e.preventDefault(); // ignore button
+        var form = $(this);
+        var url = form.attr('action');
+        var type = form.attr('method');
+        type = (type != null || type != undefined)?type: "POST";
+        sendstuff(url,type, form.serialize())
+    }
+    if($(this).hasClass( "createrace")) {
+        e.preventDefault(); // ignore button
+        var form = $(this);
+        var url = form.attr('action');
+        var type = form.attr('method');
+        type = (type != null || type != undefined)?type: "POST";
+        sendstuff(url,type, form.serialize(), (data)=>{
+            if(data != false){
+                window.location.href = window.location.href.replace(window.location.href.split('/').pop(),'');
+            }
+        })
+    }
+    if($(this).hasClass( "editrace")) {
+        e.preventDefault(); // ignore button
+        var form = $(this);
+        var url = form.attr('action');
+        var type = form.attr('method');
+        type = (type != null || type != undefined)?type: "POST";
+        sendstuff(url,type, form.serialize(), (data)=>{
+            if(data != false){
+                window.location = 'races';
+            }
+        })
+    }
     if($(this).hasClass( "removerace")) {
         e.preventDefault(); // ignore button
         if (confirm('Weet je zekker dat je hem wilt verwijderen?')) {

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "SET NODE_ENV=test& node ./bin/www",
     "test": "nodemon --exec \"mocha --timeout 10000\"",
-    "coverage": "nyc --reporter=lcov --reporter=text-lcov mocha --timeout 10000 --exit"
+    "coverage": "nyc --reporter=lcov --reporter=text-lcov mocha --timeout 28000 --exit"
   },
   "nyc": {
     "_comment": "Purpose of this part: to do code coverage within Mocha/Chai using Istanbul",

@@ -66,7 +66,7 @@ router.post('/:_oldid/waypoints/check/:_id',needjson, waypointsController.check)
  *       201:
  *         description: waypoint deleted
  */
-router.delete('/:_id/waypoints',needjson,isAdmincheck, waypointsController.delete);
+router.delete('/:_oldid/waypoints/:_id',needjson,isAdmincheck, waypointsController.delete);
 
 function isAdmincheck(req, res, next)
 {

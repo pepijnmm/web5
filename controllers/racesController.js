@@ -68,6 +68,9 @@ exports.get = function(req, res, next) {
   }
 
 exports.post = function(req, res, next) {
+  if(req.body._id){
+    req.body._id = req.body._id.replace(/[^\w\s!?]/g,'');
+  }
   var race = new Race(req.body);
   race.save(function(err)
   {
@@ -127,7 +130,9 @@ exports.post = function(req, res, next) {
       }
       else if(race != null)
       {
-
+        if(req.body._id){
+          req.body._id = req.body._id.replace(/[^\w\s!?]/g,'');
+        }
         var newrace = new Race({_id:req.body._id, isStarted: race.isStarted, waypoints:race.waypoints});
         newrace.save(function(err)
         {
@@ -233,6 +238,9 @@ exports.getlocations = function(req, res, next) {
     }
   });
 }
+  else {
+    return res.json(null);
+  }
 };
 function getLocation(number) {
   const stcafes = "https://overpass-api.de/api/interpreter?data=[out:json];";

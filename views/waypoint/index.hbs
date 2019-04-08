@@ -16,7 +16,7 @@
                 {{#each data}}
                     <tr>
                         <td>{{this._id}}</td>
-                    {{#if ../isAdmin}}<td><form action="/races/{{../this._oldid}}/waypoint/{{this._id}}" class="removerace" method="DELETE">
+                    {{#if ../isAdmin}}<td><form action="/races/{{../this._oldid}}/waypoints/{{this._id}}" class="removerace" method="DELETE">
                             <input class="btn-info" type="submit" value="Verwijderen" />
                     </form></td>{{/if}}
                     </tr>
