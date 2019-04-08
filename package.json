@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "SET NODE_ENV=test& node ./bin/www",
+    "start": "SET NODE_ENV=dev& node ./bin/www",
     "test": "nodemon --exec \"mocha --timeout 10000\"",
     "coverage": "nyc --reporter=lcov --reporter=text-lcov mocha --timeout 28000 --exit"
   },
@@ -21,7 +21,8 @@
       "**/node_modules/**",
       "**/public/**",
       "**/test/**",
-      "**/coverage/**"
+      "**/coverage/**",
+      "**/config/passport.js**"
     ],
     "all": true
   },

@@ -496,4 +496,68 @@ describe("waypoints", ()=>{
             });
         });
     });
+    describe("html page admin", ()=> {
+        describe("waypointcontrollerhtml", ()=> {
+            it("can see index page",(done)=> {
+                admin.get('/races/Arnhem bierdag/waypoints')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.text.should.contain('<form action="/races/Arnhem bierdag/waypoints/471587832" class="removerace" method="DELETE">');
+                    done();
+                });
+            });
+            it("can see create page",(done)=> {
+                admin.get('/races/Arnhem bierdag/waypoints/create')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.text.should.contain('<form id="formpage" class="createrace" action="/races/Arnhem bierdag/waypoints/create" method="POST">');
+                    done();
+                });
+            });
+        });
+        describe("racescontrollerhtml", ()=> {
+            it("can see index page",(done)=> {
+                admin.get('/races')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.text.should.contain('<form action="/races/Arnhem bierdag">');
+                        done();
+                    });
+            });
+            it("can see create page",(done)=> {
+                admin.get('/races/create')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.text.should.contain('<h1>Races Aanmaken</h1>');
+                        done();
+                    });
+            });
+            it("can see edit page",(done)=> {
+                admin.get('/races/Arnhem bierdag/edit')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.text.should.contain('<h1>Races Bewerken</h1>');
+                        done();
+                    });
+            });
+            it("can see show page",(done)=> {
+                admin.get('/races/Arnhem bierdag')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.text.should.contain('<a class="btn btn-info float-right" role="button" href="/races/Arnhem bierdag/edit">Aanpassen</a>');
+                        done();
+                    });
+            });
+        });
+        describe("usercontrollerhtml", ()=> {
+            it("can see index page",(done)=> {
+                chai.request(app).get('/login')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.text.should.contain('<div class="card-header">Login</div>');
+                        done();
+                    });
+            });
+        });
+    });
 });
